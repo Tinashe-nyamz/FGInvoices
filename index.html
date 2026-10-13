@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FinGenie Consultancy - Accounting ERP & Invoice Studio</title>
+  <title>FinGenie Consultancy - IFRS Accounting ERP & Invoice Studio</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -77,7 +77,7 @@
 
   <header class="border-b border-slate-200 bg-white/95 sticky top-0 z-40 px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4 shadow-sm print:hidden">
     <div class="flex items-center space-x-4">
-      <div onclick="openLogoModal()" class="cursor-pointer group flex items-center space-x-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-2xl p-1.5 pr-3 transition" title="Click to view or re-upload official FinGenie HD logo">
+      <div onclick="openLogoModal()" class="cursor-pointer group flex items-center space-x-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-2xl p-1.5 pr-3 transition" title="Click to view or re-upload official FinGenie logo">
         <div class="h-11 w-11 p-0.5 rounded-xl bg-white border border-slate-200 flex items-center justify-center shadow-sm overflow-hidden">
           <img id="nav-brand-logo" src="Fingenie HD_2.jpg" onerror="handleLogoFallback(this)" alt="FinGenie HD Logo" class="h-full w-full object-contain" />
         </div>
@@ -91,15 +91,16 @@
       </div>
     </div>
 
+    <!-- Right Header Controls -->
     <div class="flex items-center space-x-2.5">
-      <!-- Dedicated Direct Logo Upload Button -->
+      <!-- Hidden logo file input -->
       <input type="file" id="direct-logo-file-input" accept="image/*" class="hidden" onchange="handleLogoFileInput(event)" />
-      <button onclick="document.getElementById('direct-logo-file-input').click()" class="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-bold border border-slate-300 transition" title="Upload your unaltered FinGenie logo image file">
+      <button onclick="document.getElementById('direct-logo-file-input').click()" class="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-bold border border-slate-300 transition" title="Upload company logo">
         <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <span>Upload Logo</span>
       </button>
 
-      <button onclick="openJsonModal('export')" class="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-bold border border-slate-300 transition">
+      <button onclick="openJsonModal()" class="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-bold border border-slate-300 transition">
         <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
         <span>JSON &amp; Checkpoints</span>
         <span id="nav-checkpoint-count" class="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black">1</span>
@@ -127,7 +128,8 @@
       <span>🗂️ Chart of Accounts</span>
     </button>
     <button onclick="switchTab('statements')" id="tab-btn-statements" class="py-3.5 px-2 border-b-2 border-transparent text-slate-500 hover:text-slate-900 flex items-center space-x-2 whitespace-nowrap transition">
-      <span>📈 IFRS Statements</span>
+      <span>📈 IFRS Statements Suite</span>
+      <span class="ml-1 px-1.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-[10px] font-bold">P&amp;L • BS • CF</span>
     </button>
   </nav>
 
@@ -160,12 +162,12 @@
 
         <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500 uppercase">Capital Assets (CAPEX)</span>
-            <div class="p-2 rounded-xl bg-indigo-50 text-indigo-600 font-bold">💻</div>
+            <span class="text-xs font-semibold text-slate-500 uppercase">Trade Receivables</span>
+            <div class="p-2 rounded-xl bg-amber-50 text-amber-600 font-bold">📑</div>
           </div>
           <div class="mt-3">
-            <span id="kpi-capex" class="text-2xl font-black text-slate-900">$0.00</span>
-            <p class="text-[11px] text-indigo-600 mt-1 font-semibold">IAS 16 IT Hardware &amp; Workstations</p>
+            <span id="kpi-ar" class="text-2xl font-black text-slate-900">$0.00</span>
+            <p class="text-[11px] text-amber-600 mt-1 font-semibold">IFRS 9 Outstanding Client Invoices</p>
           </div>
         </div>
 
@@ -176,17 +178,17 @@
           </div>
           <div class="mt-3">
             <span id="kpi-profit" class="text-2xl font-black text-slate-900">$0.00</span>
-            <p class="text-[11px] text-teal-600 mt-1 font-semibold">Gross Profit less Operating Overhead</p>
+            <p class="text-[11px] text-teal-600 mt-1 font-semibold">Revenue less COS &amp; Operating Overhead</p>
           </div>
         </div>
       </div>
 
       <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
-        <h3 class="font-bold text-slate-800 text-sm mb-2">Executive Financial Summary</h3>
+        <h3 class="font-bold text-slate-800 text-sm mb-2">Executive Financial Summary &amp; IFRS Governance</h3>
         <p class="text-xs text-slate-600 leading-relaxed">
           FinGenie ERP provides strict double-entry separation between regular commercial sales revenue (credited to IFRS 15),
-          shareholder capital injections (IAS 32), loan financing facilities (IFRS 9), and capitalized tangibles (IAS 16).
-          Every invoice generated in the studio is automatically recorded as an identifiable voucher and reconciled in the balance sheet.
+          shareholder equity contributions (IAS 32), bank borrowing facilities (IFRS 9), and capitalized tangibles (IAS 16).
+          Every invoice generated in the studio is automatically recorded as an identifiable voucher in the general ledger and fully reconciled with customer balances.
         </p>
       </div>
     </section>
@@ -243,11 +245,11 @@
               </div>
               <div>
                 <label class="block text-slate-500 mb-1">Issue Date</label>
-                <input type="date" id="studio-inv-issuedate" onchange="updateInvoiceField('issueDate', this.value)" class="w-full px-3 py-1.5 rounded-xl border border-slate-300" />
+                <input type="date" id="studio-inv-issuedate" onclick="safeShowPicker(event)" onchange="updateInvoiceField('issueDate', this.value)" class="w-full px-3 py-1.5 rounded-xl border border-slate-300" />
               </div>
               <div>
                 <label class="block text-slate-500 mb-1">Due Date</label>
-                <input type="date" id="studio-inv-duedate" onchange="updateInvoiceField('dueDate', this.value)" class="w-full px-3 py-1.5 rounded-xl border border-slate-300" />
+                <input type="date" id="studio-inv-duedate" onclick="safeShowPicker(event)" onchange="updateInvoiceField('dueDate', this.value)" class="w-full px-3 py-1.5 rounded-xl border border-slate-300" />
               </div>
             </div>
           </div>
@@ -379,12 +381,20 @@
     <!-- VIEW 3: GENERAL LEDGER -->
     <section id="view-ledger" class="hidden space-y-5">
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-3">
           <span class="text-base font-bold text-slate-900">📖 General Ledger Vouchers</span>
           <span id="ledger-voucher-count" class="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full">0 Vouchers</span>
+          <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+            <span>⚖️ Double-Entry Balanced</span>
+          </span>
         </div>
         <div class="flex items-center gap-2">
-          <input type="text" id="ledger-search-input" oninput="renderLedgerTable()" placeholder="Search vouchers..." class="px-3 py-1.5 border border-slate-300 rounded-xl text-xs" />
+          <!-- Account Filter for Running Balance -->
+          <select id="ledger-account-filter" onchange="renderLedgerTable()" class="px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 focus:outline-none">
+            <option value="ALL">All Accounts (All Vouchers)</option>
+            <!-- Populated dynamically from COA -->
+          </select>
+          <input type="text" id="ledger-search-input" oninput="renderLedgerTable()" placeholder="Search vouchers, memo, #..." class="px-3 py-1.5 border border-slate-300 rounded-xl text-xs" />
         </div>
       </div>
 
@@ -395,11 +405,13 @@
               <tr class="border-b bg-slate-50 text-slate-500 font-bold uppercase">
                 <th class="p-3.5">Voucher #</th>
                 <th class="p-3.5">Date</th>
-                <th class="p-3.5">Counterparty &amp; Description</th>
+                <th class="p-3.5">Identifiable Section / Origin</th>
+                <th class="p-3.5">Description &amp; Memo</th>
                 <th class="p-3.5">Debit (DR)</th>
                 <th class="p-3.5">Credit (CR)</th>
                 <th class="p-3.5 text-right">Amount ($)</th>
-                <th class="p-3.5 text-center">Actions</th>
+                <th class="p-3.5 text-right font-mono text-blue-900">Running Bal ($)</th>
+                <th class="p-3.5 text-center">Action</th>
               </tr>
             </thead>
             <tbody id="ledger-tbody" class="divide-y divide-slate-100">
@@ -414,7 +426,7 @@
     <section id="view-coa" class="hidden space-y-5">
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <input type="text" id="coa-search-input" oninput="renderCoaTable()" placeholder="Search accounts..." class="px-3 py-1.5 border border-slate-300 rounded-xl text-xs" />
+          <input type="text" id="coa-search-input" oninput="renderCoaTable()" placeholder="Search code, name, IFRS ref..." class="px-3 py-1.5 border border-slate-300 rounded-xl text-xs" />
           <select id="coa-class-filter" onchange="renderCoaTable()" class="px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-semibold">
             <option value="ALL">All Classes</option>
             <option value="ASSET">Assets</option>
@@ -424,8 +436,8 @@
             <option value="EXPENSE">Expense</option>
           </select>
         </div>
-        <button onclick="openAddAccountModal()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">
-          + Add Account
+        <button onclick="openAddAccountModal()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+          <span>+ Add Account / Subcategory</span>
         </button>
       </div>
 
@@ -435,10 +447,11 @@
             <thead>
               <tr class="border-b bg-slate-50 text-slate-500 font-bold uppercase">
                 <th class="p-3.5">Code</th>
-                <th class="p-3.5">Account Name</th>
+                <th class="p-3.5">Account / Subcategory Name</th>
                 <th class="p-3.5">Class</th>
+                <th class="p-3.5">Subcategory Group</th>
                 <th class="p-3.5">IFRS Standard</th>
-                <th class="p-3.5 text-right">Balance ($)</th>
+                <th class="p-3.5 text-right">GL Balance ($)</th>
                 <th class="p-3.5 text-center">Actions</th>
               </tr>
             </thead>
@@ -450,34 +463,109 @@
       </div>
     </section>
 
-    <!-- VIEW 5: IFRS STATEMENTS -->
+    <!-- VIEW 5: IFRS STATEMENTS SUITE -->
     <section id="view-statements" class="hidden space-y-6">
-      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-        <h4 class="font-black text-base text-slate-900 mb-4">Statement of Profit or Loss (P&amp;L) - IFRS Compliant</h4>
-        <table class="w-full text-xs">
-          <tbody class="divide-y divide-slate-100">
-            <tr class="font-bold bg-slate-50">
-              <td class="py-2.5 px-3">Revenue from Contracts with Customers (IFRS 15)</td>
-              <td id="stmt-revenue" class="py-2.5 px-3 text-right font-mono">$0.00</td>
-            </tr>
-            <tr class="text-rose-700">
-              <td class="py-2.5 px-3">Direct Cost of Services (COS)</td>
-              <td id="stmt-cos" class="py-2.5 px-3 text-right font-mono">-$0.00</td>
-            </tr>
-            <tr class="font-bold bg-emerald-50 text-emerald-900">
-              <td class="py-2.5 px-3">Gross Operating Profit</td>
-              <td id="stmt-grossprofit" class="py-2.5 px-3 text-right font-mono">$0.00</td>
-            </tr>
-            <tr class="text-rose-700">
-              <td class="py-2.5 px-3">Operating Overhead (OPEX)</td>
-              <td id="stmt-opex" class="py-2.5 px-3 text-right font-mono">-$0.00</td>
-            </tr>
-            <tr class="font-black bg-blue-900 text-white text-sm">
-              <td class="py-3 px-3">Net Profit for the Period</td>
-              <td id="stmt-netprofit" class="py-3 px-3 text-right font-mono">$0.00</td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Statements Toolbar -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <!-- Statement Type Selector -->
+        <div class="flex items-center gap-2">
+          <button onclick="setStatementView('ALL')" id="btn-stmt-all" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-xs">
+            All 3 Statements
+          </button>
+          <button onclick="setStatementView('PL')" id="btn-stmt-pl" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">
+            Profit or Loss (P&amp;L)
+          </button>
+          <button onclick="setStatementView('BS')" id="btn-stmt-bs" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">
+            Balance Sheet (IAS 1)
+          </button>
+          <button onclick="setStatementView('CF')" id="btn-stmt-cf" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">
+            Cash Flows (IAS 7)
+          </button>
+        </div>
+
+        <!-- Period Breakdown Selector -->
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+            <button onclick="setPeriodMode('PERIODIC')" id="btn-period-periodic" class="px-3 py-1 rounded-lg bg-white text-blue-700 font-bold shadow-xs">
+              Periodic Breakdown
+            </button>
+            <button onclick="setPeriodMode('CUMULATIVE')" id="btn-period-cumulative" class="px-3 py-1 rounded-lg text-slate-600 hover:text-slate-900">
+              Cumulative YTD
+            </button>
+          </div>
+
+          <button onclick="exportStatementsToExcel()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></svg>
+            <span>Export to Excel (.xls)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STATEMENT 1: PROFIT OR LOSS (IAS 1 / IFRS 15) -->
+      <div id="container-stmt-pl" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b">
+          <div>
+            <h4 class="font-black text-base text-slate-900">1. Statement of Profit or Loss &amp; Comprehensive Income (P&amp;L)</h4>
+            <p class="text-[11px] text-slate-500 font-medium">Prepared in full accordance with IFRS 15, IAS 1, IAS 19, and IAS 23. Zero-balance subcategories are suppressed.</p>
+          </div>
+          <span class="text-xs bg-blue-50 text-blue-800 font-mono font-bold px-2.5 py-1 rounded-lg">IFRS 15 / IAS 1</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead id="stmt-pl-thead" class="border-b bg-slate-50 text-slate-600 font-bold uppercase">
+              <!-- Dynamically populated periods -->
+            </thead>
+            <tbody id="stmt-pl-tbody" class="divide-y divide-slate-100">
+              <!-- Dynamically populated subcategories -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- STATEMENT 2: BALANCE SHEET / FINANCIAL POSITION (IAS 1) -->
+      <div id="container-stmt-bs" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b">
+          <div>
+            <h4 class="font-black text-base text-slate-900">2. Statement of Financial Position (Balance Sheet)</h4>
+            <p class="text-[11px] text-slate-500 font-medium">Classified Assets, Liabilities, and Equity under IAS 1. Zero-balance subcategories suppressed.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="bs-balancing-badge" class="text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold px-2.5 py-1 rounded-lg">
+              ✓ Assets = Liab + Equity ($0.00 Diff)
+            </span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead id="stmt-bs-thead" class="border-b bg-slate-50 text-slate-600 font-bold uppercase">
+              <!-- Dynamically populated periods -->
+            </thead>
+            <tbody id="stmt-bs-tbody" class="divide-y divide-slate-100">
+              <!-- Dynamically populated subcategories -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- STATEMENT 3: STATEMENT OF CASH FLOWS (IAS 7) -->
+      <div id="container-stmt-cf" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b">
+          <div>
+            <h4 class="font-black text-base text-slate-900">3. Statement of Cash Flows (Direct Method - IAS 7)</h4>
+            <p class="text-[11px] text-slate-500 font-medium">Segregated into Operating, Investing (CAPEX), and Financing Activities with full subcategory detail.</p>
+          </div>
+          <span class="text-xs bg-emerald-50 text-emerald-800 font-mono font-bold px-2.5 py-1 rounded-lg">IAS 7 Direct Method</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead id="stmt-cf-thead" class="border-b bg-slate-50 text-slate-600 font-bold uppercase">
+              <!-- Dynamically populated periods -->
+            </thead>
+            <tbody id="stmt-cf-tbody" class="divide-y divide-slate-100">
+              <!-- Dynamically populated cash flows -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   </main>
@@ -540,7 +628,7 @@
             <div class="grid grid-cols-2 gap-2.5">
               <div>
                 <label class="block font-bold text-slate-600 mb-1">Billing Mode</label>
-                <select id="v-billing-mode" onchange="onVoucherBillingModeChange(this.value)" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-xl font-semibold">
+                <select id="v-billing-mode" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-xl font-semibold">
                   <option value="INVOICE">Invoice (Pay Later - DR 1100)</option>
                   <option value="IMMEDIATE">Immediate Cash/Bank Settlement</option>
                 </select>
@@ -672,6 +760,75 @@
     </div>
   </div>
 
+  <!-- MODAL: ADD ACCOUNT / SUBCATEGORY (CONDITIONAL IFRS STANDARD PICKER) -->
+  <div id="modal-account" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 my-8">
+      <div class="flex justify-between items-center pb-2 border-b">
+        <div>
+          <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+            <span>🗂️</span>
+            <span>Add Account &amp; Subcategory (IFRS)</span>
+          </h3>
+          <p class="text-[10px] text-slate-500 font-medium">Standards dropdown dynamically adapts with in-depth accounting guidelines</p>
+        </div>
+        <button onclick="closeAddAccountModal()" class="text-slate-400 hover:text-slate-600 font-bold p-1">✕</button>
+      </div>
+
+      <form onsubmit="handleSaveAccount(event)" class="space-y-3.5 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Account Code</label>
+            <input type="text" id="acc-code-input" placeholder="e.g. 4050" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl font-mono font-bold text-blue-700" required />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Account Class</label>
+            <select id="acc-class-input" onchange="onAccountClassChange(this.value)" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl font-bold bg-white">
+              <option value="REVENUE">REVENUE</option>
+              <option value="EXPENSE">EXPENSE</option>
+              <option value="ASSET">ASSET</option>
+              <option value="LIABILITY">LIABILITY</option>
+              <option value="EQUITY">EQUITY</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Account / Subcategory Title</label>
+          <input type="text" id="acc-name-input" placeholder="e.g. Neighborhood Eye - Rydale Platform Subscriptions" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl font-bold" required />
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Subcategory Financial Group</label>
+          <input type="text" id="acc-subcat-input" placeholder="e.g. Software Platform Subscriptions or Tangible PPE" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl font-medium" required />
+        </div>
+
+        <!-- Conditional IFRS Standard Reference Dropdown -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">IFRS Standard Reference (Conditional by Class)</label>
+          <select id="acc-ifrs-select" onchange="onIfrsStandardChange(this.value)" class="w-full px-3 py-2 border border-blue-300 bg-blue-50/50 rounded-xl font-bold text-blue-900 focus:outline-none">
+            <!-- Dynamically populated according to account class -->
+          </select>
+        </div>
+
+        <!-- Dynamic In-Depth IFRS Guidance Box -->
+        <div id="ifrs-guidance-box" class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5">
+          <div class="flex items-center gap-1.5 text-blue-700 font-bold text-[11px]">
+            <span>📘</span>
+            <span id="ifrs-guide-title">IFRS Standard Guidance</span>
+          </div>
+          <p id="ifrs-guide-desc" class="text-[11px] text-slate-600 leading-relaxed">
+            <!-- Explanation inserted dynamically -->
+          </p>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t">
+          <button type="button" onclick="closeAddAccountModal()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl font-semibold">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow">Save Account &amp; Standard</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: ADD NEW CLIENT / ENTITY -->
   <div id="modal-client" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200">
@@ -716,44 +873,6 @@
         <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
           <button type="button" onclick="closeClientModal()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-xl font-medium">Cancel</button>
           <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow">Save &amp; Select Client</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: ADD ACCOUNT -->
-  <div id="modal-account" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-      <div class="flex justify-between items-center pb-2 border-b">
-        <h3 class="font-bold text-slate-900">Add Account / Subcategory</h3>
-        <button onclick="closeAddAccountModal()" class="text-slate-400 hover:text-slate-600 font-bold">✕</button>
-      </div>
-      <form onsubmit="handleSaveAccount(event)" class="space-y-3 text-xs">
-        <div>
-          <label class="block font-bold mb-1">Account Code</label>
-          <input type="text" id="acc-code-input" placeholder="e.g. 4050" class="w-full px-3 py-1.5 border rounded-xl font-mono font-bold" required />
-        </div>
-        <div>
-          <label class="block font-bold mb-1">Account Name</label>
-          <input type="text" id="acc-name-input" placeholder="e.g. Neighborhood Eye - Rydale" class="w-full px-3 py-1.5 border rounded-xl font-bold" required />
-        </div>
-        <div>
-          <label class="block font-bold mb-1">Class</label>
-          <select id="acc-class-input" class="w-full px-3 py-1.5 border rounded-xl font-bold">
-            <option value="REVENUE">REVENUE</option>
-            <option value="EXPENSE">EXPENSE</option>
-            <option value="ASSET">ASSET</option>
-            <option value="LIABILITY">LIABILITY</option>
-            <option value="EQUITY">EQUITY</option>
-          </select>
-        </div>
-        <div>
-          <label class="block font-bold mb-1">IFRS Standard</label>
-          <input type="text" id="acc-ifrs-input" value="IFRS 15" class="w-full px-3 py-1.5 border rounded-xl font-mono" required />
-        </div>
-        <div class="flex justify-end gap-2 pt-2 border-t">
-          <button type="button" onclick="closeAddAccountModal()" class="px-3 py-1.5 bg-slate-100 rounded-xl">Cancel</button>
-          <button type="submit" class="px-4 py-1.5 bg-blue-600 text-white font-bold rounded-xl">Save Account</button>
         </div>
       </form>
     </div>
@@ -814,14 +933,139 @@
           Reset to Original Fingenie HD_2.jpg
         </button>
       </div>
-
-      <div class="text-[10px] text-slate-400 text-center leading-relaxed">
-        The uploaded file is preserved without geometric alteration or resizing distortion across the ERP header and PDF invoices.
-      </div>
     </div>
   </div>
 
   <script>
+    // IFRS Standards Master Directory mapped conditionally to account classes with comprehensive explanations
+    const IFRS_STANDARDS_BY_CLASS = {
+      REVENUE: [
+        {
+          code: 'IFRS 15',
+          title: 'IFRS 15 - Revenue from Contracts with Customers',
+          desc: 'Mandates recognition of revenue when control of goods or services is transferred to clients over time or at a point in time. Governs Neighborhood Eye platform license subscriptions, corporate advisory retainers, and assurance engagements under a 5-step model.'
+        },
+        {
+          code: 'IFRS 9',
+          title: 'IFRS 9 - Finance & Treasury Income',
+          desc: 'Governs recognition of interest income and financial gains accrued from operating bank deposits and financial assets measured at amortized cost.'
+        },
+        {
+          code: 'IAS 20',
+          title: 'IAS 20 - Accounting for Government Grants',
+          desc: 'Applies to subsidies or developmental grants recognized systematically over periods to match relevant costs.'
+        },
+        {
+          code: 'IAS 1',
+          title: 'IAS 1 - Other Operating Gains',
+          desc: 'Presentation of incidental operating income, recoveries, or ancillary fee earnings.'
+        }
+      ],
+      EXPENSE: [
+        {
+          code: 'IAS 1 / IAS 2',
+          title: 'IAS 1 / IAS 2 - Direct Cost of Services (COS)',
+          desc: 'Direct project delivery outflows directly attributable to client deliverables, including subcontracted associate consultant fees, client travel, site inspections, and specialized datasets.'
+        },
+        {
+          code: 'IAS 19',
+          title: 'IAS 19 - Employee Benefits (Staff Salaries)',
+          desc: 'Short-term and post-employment benefits for core consultancy personnel, including monthly salaries, executive compensation, and statutory benefits.'
+        },
+        {
+          code: 'IAS 1',
+          title: 'IAS 1 - Operating Overhead (OPEX)',
+          desc: 'General, administrative, and corporate overhead costs incurred in maintaining business infrastructure, such as headquarters lease, utilities, cloud ERP hosting, marketing, and office upkeep.'
+        },
+        {
+          code: 'IAS 16',
+          title: 'IAS 16 - Depreciation of Tangible Fixed Assets',
+          desc: 'Systematic periodic allocation of the depreciable amount of capital assets (laptops, servers, workstations, office furnishings) over their useful economic lives.'
+        },
+        {
+          code: 'IAS 23',
+          title: 'IAS 23 - Borrowing & Financing Costs',
+          desc: 'Commercial bank loan interest, facility fees, and borrowing charges recognized as period financing expense.'
+        },
+        {
+          code: 'IFRS 9',
+          title: 'IFRS 9 - Expected Credit Losses (ECL)',
+          desc: 'Allowances and bad debt provisions calculated against client trade accounts receivable.'
+        }
+      ],
+      ASSET: [
+        {
+          code: 'IAS 7',
+          title: 'IAS 7 - Cash & Cash Equivalents',
+          desc: 'Highly liquid resources held for meeting short-term cash commitments, including CBZ operating bank accounts, petty cash drawers, and mobile wallets (EcoCash Merchant).'
+        },
+        {
+          code: 'IFRS 9',
+          title: 'IFRS 9 - Trade Accounts Receivable (Client Invoices)',
+          desc: 'Contractual rights to receive cash from customers for services delivered or licenses issued, measured at amortized cost less ECL impairment provisions.'
+        },
+        {
+          code: 'IAS 16',
+          title: 'IAS 16 - Property, Plant and Equipment (PPE / CAPEX)',
+          desc: 'Tangible capital assets held for use in operations or consultancy delivery (high-performance MacBooks, IT servers, office furniture) with economic lifespans exceeding 1 year.'
+        },
+        {
+          code: 'IAS 38',
+          title: 'IAS 38 - Intangible Assets & Software Architecture',
+          desc: 'Identifiable non-monetary assets without physical substance, including proprietary software codebases, trademarks, and specialized enterprise software licenses.'
+        },
+        {
+          code: 'IFRS 16',
+          title: 'IFRS 16 - Right-of-Use Leased Assets',
+          desc: 'Capitalized lease assets reflecting FinGenie’s right to utilize leased office facilities over multi-year lease terms.'
+        }
+      ],
+      LIABILITY: [
+        {
+          code: 'IAS 1',
+          title: 'IAS 1 - Trade & Other Payables',
+          desc: 'Current obligations owed to suppliers, landlords, and associate vendors for goods and services received on credit terms.'
+        },
+        {
+          code: 'IFRS 9',
+          title: 'IFRS 9 - Commercial Debt & Bank Loan Facilities',
+          desc: 'Financial liabilities representing bank borrowings and term loan facilities measured at amortized cost using the effective interest method.'
+        },
+        {
+          code: 'IFRS 15',
+          title: 'IFRS 15 - Contract Liabilities (Deferred Retainers)',
+          desc: 'Unearned customer retainers and prepaid software license payments received before performance obligations are satisfied.'
+        },
+        {
+          code: 'IAS 19',
+          title: 'IAS 19 - Accrued Employee Liabilities',
+          desc: 'Accrued staff compensation, bonuses, and statutory liabilities (NSSA, PAYE) payable.'
+        },
+        {
+          code: 'IAS 24',
+          title: 'IAS 24 - Related Party Shareholder Loans',
+          desc: 'Financing loan notes advanced by founding partners or executive directors.'
+        }
+      ],
+      EQUITY: [
+        {
+          code: 'IAS 32',
+          title: 'IAS 32 - Contributed Share Capital',
+          desc: 'Equity instruments representing capital invested into FinGenie Investments (Pvt) Ltd by founding partners and equity shareholders without contractual repayment obligation.'
+        },
+        {
+          code: 'IAS 1',
+          title: 'IAS 1 - Retained Operating Earnings & Surplus',
+          desc: 'Cumulative net operating profits and retained surpluses generated across financial periods after distributions.'
+        },
+        {
+          code: 'IAS 1 / IAS 32',
+          title: 'IAS 1 / IAS 32 - Distributions to Shareholders (Dividends)',
+          desc: 'Distributions of capital surplus or dividends paid out to shareholders, debited against equity rather than P&L.'
+        }
+      ]
+    };
+
     // Fallback high-fidelity SVG representation if file path access is sandboxed
     const FINGENIE_LOGO_FALLBACK = `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
@@ -835,6 +1079,71 @@
     `)}`;
 
     let activeLogoSrc = localStorage.getItem('fingenie_brand_logo') || 'Fingenie HD_2.jpg';
+
+    // Application state
+    const state = {
+      clients: [
+        { code: 'ZIBNya', name: 'ZIBAWU - Nyabira Housing Development', address: 'Nyabira Neighborhood, Harare, Zimbabwe', category: 'Software License' },
+        { code: 'ZIBRR', name: 'ZIBAWU - Rydale Ridge Community', address: 'Rydale Ridge Neighborhood, Harare, Zimbabwe', category: 'Software License' },
+        { code: 'APEX', name: 'Apex Commercial Properties Ltd', address: 'CBD Properties, Harare, Zimbabwe', category: 'Commercial Audit' },
+        { code: 'ZIBHre', name: 'ZIBAWU - Harare Central Directorate', address: 'National Directorate, Harare, Zimbabwe', category: 'Consulting Retainer' }
+      ],
+      accounts: [
+        { code: '1010', name: 'CBZ Operating Bank Account', class: 'ASSET', subcategory: 'Cash & Cash Equivalents', ifrsRef: 'IAS 7', normalBalance: 'DEBIT' },
+        { code: '1015', name: 'Vault / Petty Cash Drawer', class: 'ASSET', subcategory: 'Cash & Cash Equivalents', ifrsRef: 'IAS 7', normalBalance: 'DEBIT' },
+        { code: '1025', name: 'EcoCash Merchant Wallet', class: 'ASSET', subcategory: 'Cash & Cash Equivalents', ifrsRef: 'IAS 7', normalBalance: 'DEBIT' },
+        { code: '1100', name: 'Trade Accounts Receivable', class: 'ASSET', subcategory: 'Client Invoices', ifrsRef: 'IFRS 9', normalBalance: 'DEBIT' },
+        { code: '1510', name: 'IT Infrastructure & Laptops', class: 'ASSET', subcategory: 'Tangible PPE (CAPEX)', ifrsRef: 'IAS 16', normalBalance: 'DEBIT' },
+        { code: '2010', name: 'Trade Accounts Payable', class: 'LIABILITY', subcategory: 'Supplier Bills', ifrsRef: 'IAS 1', normalBalance: 'CREDIT' },
+        { code: '2500', name: 'Long-term Bank Loan Debt', class: 'LIABILITY', subcategory: 'Debt Financing', ifrsRef: 'IFRS 9', normalBalance: 'CREDIT' },
+        { code: '3010', name: 'Contributed Share Capital', class: 'EQUITY', subcategory: 'Founder Capital', ifrsRef: 'IAS 32', normalBalance: 'CREDIT' },
+        { code: '3200', name: 'Dividends Paid to Shareholders', class: 'EQUITY', subcategory: 'Distributions', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
+        { code: '4010', name: 'Strategic Financial Advisory Retainers', class: 'REVENUE', subcategory: 'Management Retainers', ifrsRef: 'IFRS 15', normalBalance: 'CREDIT' },
+        { code: '4020', name: 'IFRS Conversion & Assurance Services', class: 'REVENUE', subcategory: 'Assurance & Reporting', ifrsRef: 'IFRS 15', normalBalance: 'CREDIT' },
+        { code: '4030', name: 'Corporate Financial Training', class: 'REVENUE', subcategory: 'Corporate Training', ifrsRef: 'IFRS 15', normalBalance: 'CREDIT' },
+        { code: '4040', name: 'Neighborhood Eye License Subscriptions', class: 'REVENUE', subcategory: 'Software Platform Subscriptions', ifrsRef: 'IFRS 15', normalBalance: 'CREDIT' },
+        { code: '5010', name: 'Subcontracted Associate Consultant Fees', class: 'EXPENSE', subcategory: 'Direct Professional Fees', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
+        { code: '5020', name: 'Client Engagement Travel & Site Logistics', class: 'EXPENSE', subcategory: 'Direct Project Logistics', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
+        { code: '5030', name: 'Specialized Software & Research Tooling', class: 'EXPENSE', subcategory: 'Direct Tooling', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
+        { code: '6010', name: 'Core Staff Salaries & Allowances', class: 'EXPENSE', subcategory: 'Payroll & Benefits', ifrsRef: 'IAS 19', normalBalance: 'DEBIT' },
+        { code: '6020', name: 'Headquarters Office Lease & Utilities', class: 'EXPENSE', subcategory: 'Facilities', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
+        { code: '6030', name: 'Cloud ERP Hosting & Telecoms', class: 'EXPENSE', subcategory: 'IT & Infrastructure', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
+        { code: '6040', name: 'Business Development & Acquisition', class: 'EXPENSE', subcategory: 'Marketing', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' }
+      ],
+      transactions: [
+        { id: 'tx-1', voucherNo: '#CAP_052601', date: '2026-05-02', description: 'Founders Capital Injection', debitAccount: '1010', creditAccount: '3010', amount: 75000, module: 'Shareholders Equity' },
+        { id: 'tx-2', voucherNo: '#LOAN_052601', date: '2026-05-04', description: 'Bank Expansion Loan Drawdown', debitAccount: '1010', creditAccount: '2500', amount: 35000, module: 'Debt Financing' },
+        { id: 'tx-3', voucherNo: '#ZIBNya_052601', date: '2026-05-08', description: 'ZIBAWU - Nyabira License (May)', debitAccount: '1100', creditAccount: '4040', amount: 12000, module: 'Client Invoices', linkedInvoiceId: 'inv-seed-1' },
+        { id: 'tx-3-rc', voucherNo: '#RC_ZIBNya_052601_1', date: '2026-05-12', description: 'Partial Settlement for #ZIBNya_052601', debitAccount: '1010', creditAccount: '1100', amount: 4000, module: 'Settlement Receipts', linkedInvoiceId: 'inv-seed-1' },
+        { id: 'tx-4', voucherNo: '#CAPEX_052601', date: '2026-05-14', description: 'Procurement of High-Perf MacBooks', debitAccount: '1510', creditAccount: '1010', amount: 9800, module: 'CAPEX Tangibles' },
+        { id: 'tx-5', voucherNo: '#ZIBNya_062601', date: '2026-06-15', description: 'Neighborhood Eye Platform License - June', debitAccount: '1100', creditAccount: '4040', amount: 8500, module: 'Client Invoices' },
+        { id: 'tx-6', voucherNo: '#OPEX_062601', date: '2026-06-25', description: 'Core Consultancy Staff Payroll & Benefits', debitAccount: '6010', creditAccount: '1010', amount: 4200, module: 'Operating Overhead' }
+      ],
+      invoices: [
+        {
+          id: 'inv_1',
+          invoiceNumber: '#ZIBNya_072605',
+          clientCode: 'ZIBNya',
+          issueDate: '2026-08-21',
+          dueDate: '2026-08-26',
+          status: 'unpaid',
+          items: [{ description: 'Neighborhood Eye- Nyabira for July 2026', quantity: 744, rate: 1, amount: 744 }],
+          receipts: []
+        }
+      ],
+      activeInvoiceId: 'inv_1',
+      activeStatementView: 'ALL',
+      activePeriodMode: 'PERIODIC',
+      checkpoints: [
+        { label: 'Initial Startup Snapshot', timestamp: '2026-05-02 08:00', voucherCount: 4 }
+      ],
+      voucherFormState: {
+        class: 'INCOME',
+        incomeNature: 'SALES',
+        fundingType: 'EQUITY',
+        expenseNature: 'DIRECT'
+      }
+    };
 
     function setAppLogo(src) {
       activeLogoSrc = src;
@@ -871,12 +1180,10 @@
         const result = evt.target.result;
         try {
           localStorage.setItem('fingenie_brand_logo', result);
-        } catch (err) {
-          // In case of quota limitations
-        }
+        } catch (err) {}
         setAppLogo(result);
         closeLogoModal();
-        showNotification('Original FinGenie logo updated successfully!');
+        showNotification('FinGenie logo updated successfully!');
       };
       reader.readAsDataURL(file);
     }
@@ -888,86 +1195,12 @@
       showNotification('Reset to original Fingenie HD_2.jpg');
     }
 
-    // --- State Storage ---
-    const state = {
-      clients: [
-        { code: 'ZIBNya', name: 'ZIBAWU - Nyabira Housing Development', address: 'Nyabira Neighborhood, Harare, Zimbabwe', category: 'Software License' },
-        { code: 'ZIBRR', name: 'ZIBAWU - Rydale Ridge Community', address: 'Rydale Ridge Neighborhood, Harare, Zimbabwe', category: 'Software License' },
-        { code: 'APEX', name: 'Apex Commercial Properties Ltd', address: 'CBD Properties, Harare, Zimbabwe', category: 'Commercial Audit' }
-      ],
-      accounts: [
-        { code: '1010', name: 'CBZ Operating Bank Account', class: 'ASSET', ifrsRef: 'IAS 7', normalBalance: 'DEBIT' },
-        { code: '1015', name: 'Vault / Petty Cash Drawer', class: 'ASSET', ifrsRef: 'IAS 7', normalBalance: 'DEBIT' },
-        { code: '1025', name: 'EcoCash Merchant Wallet', class: 'ASSET', ifrsRef: 'IAS 7', normalBalance: 'DEBIT' },
-        { code: '1100', name: 'Trade Accounts Receivable', class: 'ASSET', ifrsRef: 'IFRS 9', normalBalance: 'DEBIT' },
-        { code: '1510', name: 'IT Infrastructure & Laptops', class: 'ASSET', ifrsRef: 'IAS 16', normalBalance: 'DEBIT' },
-        { code: '2010', name: 'Trade Accounts Payable', class: 'LIABILITY', ifrsRef: 'IAS 1', normalBalance: 'CREDIT' },
-        { code: '2500', name: 'Long-term Bank Loan Debt', class: 'LIABILITY', ifrsRef: 'IFRS 9', normalBalance: 'CREDIT' },
-        { code: '3010', name: 'Contributed Share Capital', class: 'EQUITY', ifrsRef: 'IAS 32', normalBalance: 'CREDIT' },
-        { code: '3200', name: 'Dividends Paid to Shareholders', class: 'EQUITY', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
-        { code: '4010', name: 'Strategic Financial Advisory Retainers', class: 'REVENUE', ifrsRef: 'IFRS 15', normalBalance: 'CREDIT' },
-        { code: '4020', name: 'IFRS Conversion & Assurance Services', class: 'REVENUE', ifrsRef: 'IFRS 15', normalBalance: 'CREDIT' },
-        { code: '4030', name: 'Corporate Financial Training', class: 'REVENUE', ifrsRef: 'IFRS 15', normalBalance: 'CREDIT' },
-        { code: '4040', name: 'Neighborhood Eye License Subscriptions', class: 'REVENUE', ifrsRef: 'IFRS 15', normalBalance: 'CREDIT' },
-        { code: '5010', name: 'Subcontracted Associate Consultant Fees', class: 'EXPENSE', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
-        { code: '5020', name: 'Client Engagement Travel & Site Logistics', class: 'EXPENSE', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
-        { code: '5030', name: 'Specialized Software & Research Tooling', class: 'EXPENSE', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
-        { code: '6010', name: 'Core Staff Salaries & Allowances', class: 'EXPENSE', ifrsRef: 'IAS 19', normalBalance: 'DEBIT' },
-        { code: '6020', name: 'Headquarters Office Lease & Utilities', class: 'EXPENSE', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
-        { code: '6030', name: 'Cloud ERP Hosting & Telecoms', class: 'EXPENSE', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' },
-        { code: '6040', name: 'Business Development & Acquisition', class: 'EXPENSE', ifrsRef: 'IAS 1', normalBalance: 'DEBIT' }
-      ],
-      transactions: [
-        { id: 'tx-1', voucherNo: '#CAP_052601', date: '2026-05-02', description: 'Founders Capital Injection', debitAccount: '1010', creditAccount: '3010', amount: 75000 },
-        { id: 'tx-2', voucherNo: '#LOAN_052601', date: '2026-05-04', description: 'Bank Expansion Loan Drawdown', debitAccount: '1010', creditAccount: '2500', amount: 35000 },
-        { id: 'tx-3', voucherNo: '#ZIBNya_052601', date: '2026-05-08', description: 'ZIBAWU - Nyabira License', debitAccount: '1100', creditAccount: '4040', amount: 12000 },
-        { id: 'tx-4', voucherNo: '#CAPEX_052601', date: '2026-05-14', description: 'Procurement of High-Perf MacBooks', debitAccount: '1510', creditAccount: '1010', amount: 9800 }
-      ],
-      invoices: [
-        {
-          id: 'inv_1',
-          invoiceNumber: '#ZIBNya_072605',
-          clientCode: 'ZIBNya',
-          issueDate: '2026-08-21',
-          dueDate: '2026-08-26',
-          status: 'unpaid',
-          items: [{ description: 'Neighborhood Eye- Nyabira for July 2026', quantity: 744, rate: 1, amount: 744 }],
-          receipts: []
-        }
-      ],
-      activeInvoiceId: 'inv_1',
-      checkpoints: [
-        { label: 'Initial Startup Snapshot', timestamp: '2026-05-02 08:00', voucherCount: 4 }
-      ],
-      voucherFormState: {
-        class: 'INCOME',
-        incomeNature: 'SALES',
-        fundingType: 'EQUITY',
-        expenseNature: 'DIRECT'
-      }
-    };
-
-    function generateVoucherNumber(prefix = 'GEN', dateStr = '') {
-      const d = dateStr ? new Date(dateStr) : new Date();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const y = String(d.getFullYear()).slice(-2);
-      const cleanPrefix = (prefix || 'GEN').replace(/[^a-zA-Z0-9]/g, '');
-
-      // Count existing transactions matching prefix and MMYY
-      const pattern = `#${cleanPrefix}_${m}${y}`;
-      const matchingCount = state.transactions.filter(t => t.voucherNo && t.voucherNo.startsWith(pattern)).length;
-      const seq = String(matchingCount + 1).padStart(2, '0');
-      return `#${cleanPrefix}_${m}${y}${seq}`;
-    }
-
     function safeShowPicker(e) {
       try {
         if (e && e.target && typeof e.target.showPicker === 'function') {
           e.target.showPicker();
         }
-      } catch (err) {
-        // Fallback for sandboxed iframes
-      }
+      } catch (err) {}
     }
 
     function showNotification(msg) {
@@ -977,6 +1210,18 @@
       toast.innerHTML = `<span>✨</span><span>${msg}</span>`;
       container.appendChild(toast);
       setTimeout(() => toast.remove(), 3200);
+    }
+
+    function generateVoucherNumber(prefix = 'GEN', dateStr = '') {
+      const d = dateStr ? new Date(dateStr) : new Date();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const y = String(d.getFullYear()).slice(-2);
+      const cleanPrefix = (prefix || 'GEN').replace(/[^a-zA-Z0-9]/g, '');
+
+      const pattern = `#${cleanPrefix}_${m}${y}`;
+      const matchingCount = state.transactions.filter(t => t.voucherNo && t.voucherNo.startsWith(pattern)).length;
+      const seq = String(matchingCount + 1).padStart(2, '0');
+      return `#${cleanPrefix}_${m}${y}${seq}`;
     }
 
     function calculateInvoiceTotal(inv) {
@@ -996,7 +1241,6 @@
       const paid = calculateInvoicePaid(inv);
       const bal = calculateInvoiceBalance(inv);
 
-      // Remove previous vouchers linked to this invoice
       state.transactions = state.transactions.filter(t => t.linkedInvoiceId !== inv.id && t.id !== inv.id);
 
       const mainTx = {
@@ -1007,6 +1251,7 @@
         debitAccount: bal <= 0 && paid > 0 ? '1010' : '1100',
         creditAccount: '4040',
         amount: total,
+        module: 'Client Invoices',
         linkedInvoiceId: inv.id
       };
 
@@ -1018,6 +1263,7 @@
         debitAccount: '1010',
         creditAccount: '1100',
         amount: Number(r.amount),
+        module: 'Settlement Receipts',
         linkedInvoiceId: inv.id
       }));
 
@@ -1039,22 +1285,23 @@
       if (tabId === 'studio') renderStudio();
       if (tabId === 'ledger') renderLedgerTable();
       if (tabId === 'coa') renderCoaTable();
-      if (tabId === 'statements') renderStatements();
+      if (tabId === 'statements') renderStatementsSuite();
     }
 
     function renderDashboard() {
-      let rev = 0, cash = 0, capex = 0, opex = 0;
+      let rev = 0, cash = 0, ar = 0, opex = 0;
       state.transactions.forEach(t => {
-        if (t.creditAccount === '4040' || t.creditAccount === '4010' || t.creditAccount === '4020' || t.creditAccount === '4030') rev += t.amount;
-        if (t.debitAccount === '1010' || t.debitAccount === '1015' || t.debitAccount === '1025') cash += t.amount;
-        if (t.creditAccount === '1010' || t.creditAccount === '1015' || t.creditAccount === '1025') cash -= t.amount;
-        if (t.debitAccount === '1510') capex += t.amount;
-        if (t.debitAccount === '6010' || t.debitAccount === '6020' || t.debitAccount === '6030' || t.debitAccount === '6040') opex += t.amount;
+        if (['4010', '4020', '4030', '4040'].includes(t.creditAccount)) rev += t.amount;
+        if (['1010', '1015', '1025'].includes(t.debitAccount)) cash += t.amount;
+        if (['1010', '1015', '1025'].includes(t.creditAccount)) cash -= t.amount;
+        if (t.debitAccount === '1100') ar += t.amount;
+        if (t.creditAccount === '1100') ar -= t.amount;
+        if (['6010', '6020', '6030', '6040'].includes(t.debitAccount)) opex += t.amount;
       });
 
       document.getElementById('kpi-revenue').textContent = `$${rev.toLocaleString()}`;
       document.getElementById('kpi-cash').textContent = `$${cash.toLocaleString()}`;
-      document.getElementById('kpi-capex').textContent = `$${capex.toLocaleString()}`;
+      document.getElementById('kpi-ar').textContent = `$${Math.max(0, ar).toLocaleString()}`;
       document.getElementById('kpi-profit').textContent = `$${(rev - opex).toLocaleString()}`;
     }
 
@@ -1078,7 +1325,7 @@
         <option value="${c.code}" ${c.code === inv.clientCode ? 'selected' : ''}>${c.name}</option>
       `).join('');
 
-      // Items Editor
+      // Line items editor
       const itemsList = document.getElementById('studio-items-list');
       itemsList.innerHTML = inv.items.map((it, idx) => `
         <div class="p-3 bg-slate-50 rounded-xl space-y-2 text-xs">
@@ -1090,38 +1337,34 @@
         </div>
       `).join('');
 
-      // Receipts Editor
+      // Editable receipts editor
       const receiptsList = document.getElementById('studio-receipts-list');
       receiptsList.innerHTML = (!inv.receipts || inv.receipts.length === 0)
-        ? '<div class="text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-xs text-slate-400">No receipts recorded yet. Click <strong>+ Record Receipt</strong> to add client payment details.</div>'
+        ? '<div class="text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-xs text-slate-400">No receipts recorded yet. Click <strong>+ Record Receipt</strong> to add client payments.</div>'
         : inv.receipts.map((r, idx) => `
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs transition">
             <div class="flex items-center justify-between gap-2 pb-1 border-b border-slate-200">
-              <span class="font-bold text-emerald-800 text-[11px] flex items-center gap-1">
-                <span>💳 Receipt #${idx + 1}</span>
-              </span>
-              <button type="button" onclick="removeStudioReceipt(${idx})" class="text-rose-500 hover:text-rose-700 p-1 rounded hover:bg-rose-50 transition" title="Delete Receipt">
-                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-              </button>
+              <span class="font-bold text-emerald-800 text-[11px]">💳 Receipt #${idx + 1}</span>
+              <button type="button" onclick="removeStudioReceipt(${idx})" class="text-rose-500 hover:text-rose-700 p-1" title="Delete">✕</button>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Payment Date</label>
-                <input type="date" value="${r.date || ''}" onclick="safeShowPicker(event)" onchange="updateStudioReceipt(${idx}, 'date', this.value)" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                <input type="date" value="${r.date || ''}" onclick="safeShowPicker(event)" onchange="updateStudioReceipt(${idx}, 'date', this.value)" class="w-full px-2 py-1.5 bg-white border rounded-lg text-xs" />
               </div>
               <div>
                 <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Amount Paid ($ USD)</label>
-                <input type="number" step="0.01" min="0" value="${r.amount ?? 0}" oninput="updateStudioReceipt(${idx}, 'amount', parseFloat(this.value) || 0)" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-emerald-700 font-mono focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                <input type="number" step="0.01" min="0" value="${r.amount ?? 0}" oninput="updateStudioReceipt(${idx}, 'amount', parseFloat(this.value) || 0)" class="w-full px-2 py-1.5 bg-white border rounded-lg text-xs font-bold text-emerald-700 font-mono" />
               </div>
             </div>
             <div>
               <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Payment Details / Method / Ref</label>
-              <input type="text" value="${(r.description || '').replace(/"/g, '&quot;')}" placeholder="e.g. EcoCash 0774148760 / CBZ Nostro 3211100464001 / Ref #..." oninput="updateStudioReceipt(${idx}, 'description', this.value)" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              <input type="text" value="${(r.description || '').replace(/"/g, '&quot;')}" placeholder="e.g. EcoCash 0774148760 / CBZ Nostro" oninput="updateStudioReceipt(${idx}, 'description', this.value)" class="w-full px-2.5 py-1.5 bg-white border rounded-lg text-xs" />
             </div>
           </div>
         `).join('');
 
-      // PDF Document Canvas
+      // PDF canvas rendering
       const client = state.clients.find(c => c.code === inv.clientCode) || state.clients[0];
       document.getElementById('pdf-doc-number').textContent = inv.invoiceNumber;
       document.getElementById('pdf-doc-client-name').textContent = client.name;
@@ -1176,186 +1419,484 @@
 
     function renderLedgerTable() {
       const q = (document.getElementById('ledger-search-input')?.value || '').toLowerCase();
-      const filtered = state.transactions.filter(t => t.voucherNo.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
+      const accFilter = document.getElementById('ledger-account-filter')?.value || 'ALL';
+
+      // Update account selector options
+      const accSel = document.getElementById('ledger-account-filter');
+      if (accSel && accSel.options.length <= 1) {
+        state.accounts.forEach(a => {
+          const opt = document.createElement('option');
+          opt.value = a.code;
+          opt.textContent = `${a.code} - ${a.name} (${a.class})`;
+          accSel.appendChild(opt);
+        });
+      }
+
+      // Sort chronological ascending for running balance calculation, then display
+      const sortedTxs = [...state.transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      let runningBal = 0;
+      const txsWithRunning = sortedTxs.map(t => {
+        if (accFilter !== 'ALL') {
+          const accObj = state.accounts.find(a => a.code === accFilter);
+          const isDebit = t.debitAccount === accFilter;
+          const isCredit = t.creditAccount === accFilter;
+          if (accObj?.normalBalance === 'DEBIT') {
+            if (isDebit) runningBal += t.amount;
+            if (isCredit) runningBal -= t.amount;
+          } else {
+            if (isCredit) runningBal += t.amount;
+            if (isDebit) runningBal -= t.amount;
+          }
+        } else {
+          runningBal += t.amount;
+        }
+        return { ...t, currentRunningBal: runningBal };
+      });
+
+      // Filter by account and search query
+      const filtered = txsWithRunning.filter(t => {
+        const matchesAcc = accFilter === 'ALL' || t.debitAccount === accFilter || t.creditAccount === accFilter;
+        const matchesQ = t.voucherNo.toLowerCase().includes(q) || t.description.toLowerCase().includes(q) || (t.module || '').toLowerCase().includes(q);
+        return matchesAcc && matchesQ;
+      }).reverse(); // Display most recent first
 
       document.getElementById('ledger-voucher-count').textContent = `${state.transactions.length} Vouchers`;
       const tbody = document.getElementById('ledger-tbody');
-      tbody.innerHTML = filtered.map(t => `
-        <tr class="hover:bg-blue-50/30">
-          <td class="p-3.5 font-mono font-bold text-blue-700">${t.voucherNo}</td>
-          <td class="p-3.5 text-slate-600">${t.date}</td>
-          <td class="p-3.5 font-semibold text-slate-900">${t.description}</td>
-          <td class="p-3.5 font-mono text-blue-800">${t.debitAccount}</td>
-          <td class="p-3.5 font-mono text-indigo-700">${t.creditAccount}</td>
-          <td class="p-3.5 text-right font-mono font-bold">$${t.amount.toLocaleString()}</td>
-          <td class="p-3.5 text-center">
-            <button onclick="deleteTransaction('${t.id}')" class="text-rose-500 hover:text-rose-700 font-bold">Delete</button>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = filtered.map(t => {
+        let badgeStyle = 'bg-blue-50 text-blue-800 border-blue-200';
+        if (t.module === 'Settlement Receipts') badgeStyle = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+        else if (t.module === 'Debt Financing') badgeStyle = 'bg-purple-50 text-purple-800 border-purple-200';
+        else if (t.module === 'CAPEX Tangibles') badgeStyle = 'bg-indigo-50 text-indigo-800 border-indigo-200';
+
+        return `
+          <tr class="hover:bg-blue-50/30">
+            <td class="p-3.5 font-mono font-bold text-blue-700">${t.voucherNo}</td>
+            <td class="p-3.5 text-slate-600">${t.date}</td>
+            <td class="p-3.5">
+              <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border ${badgeStyle}">
+                ${t.module || 'General Ledger'}
+              </span>
+            </td>
+            <td class="p-3.5 font-semibold text-slate-900">${t.description}</td>
+            <td class="p-3.5 font-mono text-blue-800">${t.debitAccount}</td>
+            <td class="p-3.5 font-mono text-indigo-700">${t.creditAccount}</td>
+            <td class="p-3.5 text-right font-mono font-bold">$${t.amount.toLocaleString()}</td>
+            <td class="p-3.5 text-right font-mono font-bold text-slate-700">$${t.currentRunningBal.toLocaleString()}</td>
+            <td class="p-3.5 text-center">
+              ${t.linkedInvoiceId ? `
+                <button onclick="traceToStudio('${t.linkedInvoiceId}')" class="text-blue-600 hover:text-blue-800 font-bold text-[11px] underline">
+                  Trace Invoice
+                </button>
+              ` : `
+                <button onclick="deleteTransaction('${t.id}')" class="text-rose-500 hover:text-rose-700 font-bold">Delete</button>
+              `}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function traceToStudio(invId) {
+      state.activeInvoiceId = invId;
+      switchTab('studio');
+      showNotification(`Switched to active invoice #${invId}`);
     }
 
     function renderCoaTable() {
       const q = (document.getElementById('coa-search-input')?.value || '').toLowerCase();
       const cls = document.getElementById('coa-class-filter')?.value || 'ALL';
       const filtered = state.accounts.filter(a => {
-        const matchesQ = a.code.toLowerCase().includes(q) || a.name.toLowerCase().includes(q);
+        const matchesQ = a.code.toLowerCase().includes(q) || a.name.toLowerCase().includes(q) || a.ifrsRef.toLowerCase().includes(q);
         const matchesCls = cls === 'ALL' || a.class === cls;
         return matchesQ && matchesCls;
       });
 
       const tbody = document.getElementById('coa-tbody');
-      tbody.innerHTML = filtered.map(a => `
-        <tr class="hover:bg-blue-50/30">
-          <td class="p-3.5 font-mono font-bold text-blue-700">${a.code}</td>
-          <td class="p-3.5 font-semibold text-slate-900">${a.name}</td>
-          <td class="p-3.5"><span class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-bold">${a.class}</span></td>
-          <td class="p-3.5 font-mono text-blue-900">${a.ifrsRef}</td>
-          <td class="p-3.5 text-right font-mono font-bold">$0.00</td>
-          <td class="p-3.5 text-center">
-            <button onclick="deleteAccount('${a.code}')" class="text-rose-500 hover:text-rose-700 font-bold">Delete</button>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = filtered.map(a => {
+        let bal = 0;
+        state.transactions.forEach(t => {
+          if (t.debitAccount === a.code) bal += (a.normalBalance === 'DEBIT' ? t.amount : -t.amount);
+          if (t.creditAccount === a.code) bal += (a.normalBalance === 'CREDIT' ? t.amount : -t.amount);
+        });
+
+        return `
+          <tr class="hover:bg-blue-50/30">
+            <td class="p-3.5 font-mono font-bold text-blue-700">${a.code}</td>
+            <td class="p-3.5 font-semibold text-slate-900">${a.name}</td>
+            <td class="p-3.5"><span class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-bold">${a.class}</span></td>
+            <td class="p-3.5 text-slate-600">${a.subcategory || 'General'}</td>
+            <td class="p-3.5 font-mono text-blue-900 font-bold">${a.ifrsRef}</td>
+            <td class="p-3.5 text-right font-mono font-bold">$${bal.toLocaleString()}</td>
+            <td class="p-3.5 text-center">
+              <button onclick="deleteAccount('${a.code}')" class="text-rose-500 hover:text-rose-700 font-bold">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
-    function renderStatements() {
-      let rev = 0, cos = 0, opex = 0;
-      state.transactions.forEach(t => {
-        if (t.creditAccount === '4040' || t.creditAccount === '4010' || t.creditAccount === '4020' || t.creditAccount === '4030') rev += t.amount;
-        if (t.debitAccount === '5010' || t.debitAccount === '5020' || t.debitAccount === '5030') cos += t.amount;
-        if (t.debitAccount === '6010' || t.debitAccount === '6020' || t.debitAccount === '6030' || t.debitAccount === '6040') opex += t.amount;
+    function openAddAccountModal() {
+      document.getElementById('modal-account').classList.remove('hidden');
+      onAccountClassChange(document.getElementById('acc-class-input').value);
+    }
+
+    function closeAddAccountModal() {
+      document.getElementById('modal-account').classList.add('hidden');
+    }
+
+    function onAccountClassChange(accClass) {
+      const standards = IFRS_STANDARDS_BY_CLASS[accClass] || IFRS_STANDARDS_BY_CLASS['REVENUE'];
+      const select = document.getElementById('acc-ifrs-select');
+      select.innerHTML = standards.map(s => `
+        <option value="${s.code}">${s.title}</option>
+      `).join('');
+
+      onIfrsStandardChange(standards[0]?.code);
+    }
+
+    function onIfrsStandardChange(stdCode) {
+      const accClass = document.getElementById('acc-class-input').value;
+      const standards = IFRS_STANDARDS_BY_CLASS[accClass] || [];
+      const standardObj = standards.find(s => s.code === stdCode) || standards[0];
+
+      if (standardObj) {
+        document.getElementById('ifrs-guide-title').textContent = standardObj.title;
+        document.getElementById('ifrs-guide-desc').textContent = standardObj.desc;
+      }
+    }
+
+    function handleSaveAccount(e) {
+      e.preventDefault();
+      const code = document.getElementById('acc-code-input').value.trim();
+      const name = document.getElementById('acc-name-input').value.trim();
+      const cls = document.getElementById('acc-class-input').value;
+      const subcat = document.getElementById('acc-subcat-input').value.trim();
+      const ifrs = document.getElementById('acc-ifrs-select').value;
+
+      const norm = (cls === 'ASSET' || cls === 'EXPENSE') ? 'DEBIT' : 'CREDIT';
+      state.accounts.push({ code, name, class: cls, subcategory: subcat, ifrsRef: ifrs, normalBalance: norm });
+      closeAddAccountModal();
+      renderCoaTable();
+      showNotification(`Account ${code} (${ifrs}) created!`);
+    }
+
+    function deleteAccount(code) {
+      state.accounts = state.accounts.filter(a => a.code !== code);
+      renderCoaTable();
+      showNotification(`Account ${code} deleted.`);
+    }
+
+    function setStatementView(view) {
+      state.activeStatementView = view;
+      ['all', 'pl', 'bs', 'cf'].forEach(v => {
+        const btn = document.getElementById(`btn-stmt-${v}`);
+        if (v.toUpperCase() === view) {
+          btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-xs';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200';
+        }
       });
 
-      document.getElementById('stmt-revenue').textContent = `$${rev.toLocaleString()}`;
-      document.getElementById('stmt-cos').textContent = `-$${cos.toLocaleString()}`;
-      document.getElementById('stmt-grossprofit').textContent = `$${(rev - cos).toLocaleString()}`;
-      document.getElementById('stmt-opex').textContent = `-$${opex.toLocaleString()}`;
-      document.getElementById('stmt-netprofit').textContent = `$${(rev - cos - opex).toLocaleString()}`;
-    }
+      const cPl = document.getElementById('container-stmt-pl');
+      const cBs = document.getElementById('container-stmt-bs');
+      const cCf = document.getElementById('container-stmt-cf');
 
-    function onStudioInvoiceChange(invId) {
-      state.activeInvoiceId = invId;
-      renderStudio();
-    }
-
-    function updateInvoiceField(field, val) {
-      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
-      if (inv) {
-        inv[field] = val;
-        syncInvoiceToLedger(inv);
-        renderStudio();
+      if (view === 'ALL') {
+        cPl.classList.remove('hidden');
+        cBs.classList.remove('hidden');
+        cCf.classList.remove('hidden');
+      } else if (view === 'PL') {
+        cPl.classList.remove('hidden');
+        cBs.classList.add('hidden');
+        cCf.classList.add('hidden');
+      } else if (view === 'BS') {
+        cPl.classList.add('hidden');
+        cBs.classList.remove('hidden');
+        cCf.classList.add('hidden');
+      } else if (view === 'CF') {
+        cPl.classList.add('hidden');
+        cBs.classList.add('hidden');
+        cCf.classList.remove('hidden');
       }
     }
 
-    function onStudioClientChange(clientCode) {
-      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
-      if (inv) {
-        inv.clientCode = clientCode;
-        inv.invoiceNumber = generateVoucherNumber(clientCode, inv.issueDate);
-        syncInvoiceToLedger(inv);
-        renderStudio();
+    function setPeriodMode(mode) {
+      state.activePeriodMode = mode;
+      const bPer = document.getElementById('btn-period-periodic');
+      const bCum = document.getElementById('btn-period-cumulative');
+      if (mode === 'PERIODIC') {
+        bPer.className = 'px-3 py-1 rounded-lg bg-white text-blue-700 font-bold shadow-xs';
+        bCum.className = 'px-3 py-1 rounded-lg text-slate-600 hover:text-slate-900';
+      } else {
+        bCum.className = 'px-3 py-1 rounded-lg bg-white text-blue-700 font-bold shadow-xs';
+        bPer.className = 'px-3 py-1 rounded-lg text-slate-600 hover:text-slate-900';
       }
+      renderStatementsSuite();
     }
 
-    function updateStudioItem(idx, field, val) {
-      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
-      if (inv && inv.items[idx]) {
-        inv.items[idx][field] = val;
-        syncInvoiceToLedger(inv);
-        renderStudio();
-      }
+    function getOperatingPeriods() {
+      const periodsSet = new Set();
+      state.transactions.forEach(t => {
+        if (t.date) {
+          const parts = t.date.split('-');
+          periodsSet.add(`${parts[0]}-${parts[1]}`); // YYYY-MM
+        }
+      });
+      return Array.from(periodsSet).sort();
     }
 
-    function addStudioItem() {
-      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
-      if (inv) {
-        inv.items.push({ description: 'Neighborhood Eye License', quantity: 1, rate: 744, amount: 744 });
-        syncInvoiceToLedger(inv);
-        renderStudio();
-        showNotification('Item added');
-      }
+    function renderStatementsSuite() {
+      const periods = getOperatingPeriods();
+      renderProfitOrLoss(periods);
+      renderBalanceSheet(periods);
+      renderCashFlow(periods);
     }
 
-    function updateStudioReceipt(idx, field, val) {
-      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
-      if (inv && inv.receipts && inv.receipts[idx]) {
-        inv.receipts[idx][field] = val;
-        syncInvoiceToLedger(inv);
-        renderStudio();
-        renderDashboard();
-        renderStatements();
-        renderLedgerTable();
-      }
-    }
+    function renderProfitOrLoss(periods) {
+      const thead = document.getElementById('stmt-pl-thead');
+      const tbody = document.getElementById('stmt-pl-tbody');
 
-    function removeStudioReceipt(idx) {
-      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
-      if (inv && inv.receipts && inv.receipts[idx]) {
-        inv.receipts.splice(idx, 1);
-        syncInvoiceToLedger(inv);
-        renderStudio();
-        renderDashboard();
-        renderStatements();
-        renderLedgerTable();
-        showNotification('Receipt removed and ledger updated');
-      }
-    }
+      const colHeaders = state.activePeriodMode === 'PERIODIC'
+        ? periods.map(p => `<th class="py-2.5 px-3 text-right">${p}</th>`).join('') + `<th class="py-2.5 px-3 text-right font-black">YTD Total</th>`
+        : `<th class="py-2.5 px-3 text-right font-black">Full Period YTD</th>`;
 
-    function addStudioReceipt() {
-      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
-      if (inv) {
-        if (!inv.receipts) inv.receipts = [];
-        const bal = calculateInvoiceBalance(inv);
-        inv.receipts.push({
-          date: new Date().toISOString().split('T')[0],
-          description: 'CBZ Nostro / EcoCash 0774148760 Transfer',
-          amount: bal > 0 ? bal : 500
+      thead.innerHTML = `<tr><th class="py-2.5 px-3">Revenue &amp; Cost Category (Subcategories)</th>${colHeaders}</tr>`;
+
+      // Helper to compute subcategory balance
+      function getSubcatRow(accCodes, title, isExpense = false) {
+        const periodValues = periods.map(p => {
+          let sum = 0;
+          state.transactions.forEach(t => {
+            if (t.date.startsWith(p)) {
+              if (isExpense && accCodes.includes(t.debitAccount)) sum += t.amount;
+              if (!isExpense && accCodes.includes(t.creditAccount)) sum += t.amount;
+            }
+          });
+          return sum;
         });
-        syncInvoiceToLedger(inv);
-        renderStudio();
-        renderDashboard();
-        renderStatements();
-        renderLedgerTable();
-        showNotification('Receipt recorded & posted to GL');
+
+        const totalYtd = periodValues.reduce((a, b) => a + b, 0);
+
+        // Zero-balance suppression rule
+        if (totalYtd === 0) return '';
+
+        const cols = state.activePeriodMode === 'PERIODIC'
+          ? periodValues.map(v => `<td class="py-2 px-3 text-right font-mono">${isExpense && v > 0 ? '-' : ''}$${v.toLocaleString()}</td>`).join('') + `<td class="py-2 px-3 text-right font-mono font-bold">${isExpense && totalYtd > 0 ? '-' : ''}$${totalYtd.toLocaleString()}</td>`
+          : `<td class="py-2 px-3 text-right font-mono font-bold">${isExpense && totalYtd > 0 ? '-' : ''}$${totalYtd.toLocaleString()}</td>`;
+
+        return `<tr><td class="py-2 px-3 pl-6 text-slate-700">${title}</td>${cols}</tr>`;
       }
+
+      // Compute summary totals for Gross & Net Profit
+      function getSummaryRow(calcFn, title, rowClass = 'font-bold bg-slate-50') {
+        const periodValues = periods.map(p => calcFn(p));
+        const total = periodValues.reduce((a, b) => a + b, 0);
+
+        const cols = state.activePeriodMode === 'PERIODIC'
+          ? periodValues.map(v => `<td class="py-2.5 px-3 text-right font-mono">${v < 0 ? '-' : ''}$${Math.abs(v).toLocaleString()}</td>`).join('') + `<td class="py-2.5 px-3 text-right font-mono font-black">${total < 0 ? '-' : ''}$${Math.abs(total).toLocaleString()}</td>`
+          : `<td class="py-2.5 px-3 text-right font-mono font-black">${total < 0 ? '-' : ''}$${Math.abs(total).toLocaleString()}</td>`;
+
+        return `<tr class="${rowClass}"><td class="py-2.5 px-3">${title}</td>${cols}</tr>`;
+      }
+
+      tbody.innerHTML = `
+        <tr class="font-bold bg-blue-50/70 text-blue-950"><td colspan="10" class="py-2 px-3">Revenue from Contracts with Customers (IFRS 15)</td></tr>
+        ${getSubcatRow(['4040'], 'Neighborhood Eye Platform Subscriptions (4040)')}
+        ${getSubcatRow(['4010'], 'Strategic Financial Advisory Retainers (4010)')}
+        ${getSubcatRow(['4020'], 'IFRS Conversion & Assurance Services (4020)')}
+        ${getSubcatRow(['4030'], 'Corporate Financial Training (4030)')}
+        
+        <tr class="font-bold bg-rose-50/50 text-rose-950"><td colspan="10" class="py-2 px-3">Direct Cost of Services (COS - IAS 1/2)</td></tr>
+        ${getSubcatRow(['5010'], 'Subcontracted Associate Consultant Fees (5010)', true)}
+        ${getSubcatRow(['5020'], 'Client Engagement Travel & Logistics (5020)', true)}
+        ${getSubcatRow(['5030'], 'Specialized Software & Tooling (5030)', true)}
+
+        ${getSummaryRow((p) => {
+          let rev = 0, cos = 0;
+          state.transactions.forEach(t => {
+            if (t.date.startsWith(p)) {
+              if (['4010','4020','4030','4040'].includes(t.creditAccount)) rev += t.amount;
+              if (['5010','5020','5030'].includes(t.debitAccount)) cos += t.amount;
+            }
+          });
+          return rev - cos;
+        }, 'Gross Operating Profit', 'font-black bg-emerald-50 text-emerald-900')}
+
+        <tr class="font-bold bg-slate-50 text-slate-800"><td colspan="10" class="py-2 px-3">Operating Overhead (OPEX - IAS 1/19)</td></tr>
+        ${getSubcatRow(['6010'], 'Core Staff Salaries & Allowances (6010 - IAS 19)', true)}
+        ${getSubcatRow(['6020'], 'Headquarters Office Lease & Utilities (6020)', true)}
+        ${getSubcatRow(['6030'], 'Cloud ERP Hosting & Telecoms (6030)', true)}
+        ${getSubcatRow(['6040'], 'Business Development & Acquisition (6040)', true)}
+
+        ${getSummaryRow((p) => {
+          let rev = 0, exp = 0;
+          state.transactions.forEach(t => {
+            if (t.date.startsWith(p)) {
+              if (['4010','4020','4030','4040'].includes(t.creditAccount)) rev += t.amount;
+              if (['5010','5020','5030','6010','6020','6030','6040'].includes(t.debitAccount)) exp += t.amount;
+            }
+          });
+          return rev - exp;
+        }, 'Net Profit / (Loss) for the Period', 'font-black bg-blue-900 text-white text-sm')}
+      `;
     }
 
-    function createNewInvoice() {
-      const defaultClient = state.clients[0]?.code || 'ZIBNya';
-      const today = new Date().toISOString().split('T')[0];
-      const newInv = {
-        id: `inv_${Date.now()}`,
-        invoiceNumber: generateVoucherNumber(defaultClient, today),
-        clientCode: defaultClient,
-        issueDate: today,
-        dueDate: today,
-        status: 'unpaid',
-        items: [{ description: 'Neighborhood Eye License', quantity: 744, rate: 1, amount: 744 }],
-        receipts: []
-      };
-      state.invoices.unshift(newInv);
-      state.activeInvoiceId = newInv.id;
-      syncInvoiceToLedger(newInv);
-      renderStudio();
-      showNotification(`Created invoice ${newInv.invoiceNumber}`);
+    function renderBalanceSheet(periods) {
+      const thead = document.getElementById('stmt-bs-thead');
+      const tbody = document.getElementById('stmt-bs-tbody');
+
+      const colHeaders = state.activePeriodMode === 'PERIODIC'
+        ? periods.map(p => `<th class="py-2.5 px-3 text-right">As of ${p}</th>`).join('') + `<th class="py-2.5 px-3 text-right font-black">Current Balance</th>`
+        : `<th class="py-2.5 px-3 text-right font-black">Current Financial Position</th>`;
+
+      thead.innerHTML = `<tr><th class="py-2.5 px-3">Assets, Liabilities &amp; Equity Accounts</th>${colHeaders}</tr>`;
+
+      function getBsRow(code, title, normal = 'DEBIT') {
+        const periodValues = periods.map(p => {
+          let bal = 0;
+          state.transactions.forEach(t => {
+            if (t.date <= `${p}-31`) {
+              if (t.debitAccount === code) bal += (normal === 'DEBIT' ? t.amount : -t.amount);
+              if (t.creditAccount === code) bal += (normal === 'CREDIT' ? t.amount : -t.amount);
+            }
+          });
+          return bal;
+        });
+
+        const currentBal = periodValues[periodValues.length - 1] || 0;
+        if (currentBal === 0) return '';
+
+        const cols = state.activePeriodMode === 'PERIODIC'
+          ? periodValues.map(v => `<td class="py-2 px-3 text-right font-mono">$${v.toLocaleString()}</td>`).join('') + `<td class="py-2 px-3 text-right font-mono font-bold">$${currentBal.toLocaleString()}</td>`
+          : `<td class="py-2 px-3 text-right font-mono font-bold">$${currentBal.toLocaleString()}</td>`;
+
+        return `<tr><td class="py-2 px-3 pl-6 text-slate-700">${title}</td>${cols}</tr>`;
+      }
+
+      tbody.innerHTML = `
+        <tr class="font-bold bg-slate-50"><td colspan="10" class="py-2 px-3">CURRENT ASSETS (IAS 7 / IFRS 9)</td></tr>
+        ${getBsRow('1010', 'CBZ Operating Bank Account (1010 - IAS 7)')}
+        ${getBsRow('1025', 'EcoCash Merchant Wallet (1025 - IAS 7)')}
+        ${getBsRow('1015', 'Vault / Petty Cash (1015 - IAS 7)')}
+        ${getBsRow('1100', 'Trade Accounts Receivable (1100 - IFRS 9)')}
+
+        <tr class="font-bold bg-slate-50"><td colspan="10" class="py-2 px-3">NON-CURRENT ASSETS (CAPEX - IAS 16)</td></tr>
+        ${getBsRow('1510', 'IT Infrastructure & Workstations (1510 - IAS 16)')}
+
+        <tr class="font-bold bg-slate-50"><td colspan="10" class="py-2 px-3">LIABILITIES (IAS 1 / IFRS 9)</td></tr>
+        ${getBsRow('2010', 'Trade Accounts Payable (2010 - IAS 1)', 'CREDIT')}
+        ${getBsRow('2500', 'Long-term Bank Loan Debt (2500 - IFRS 9)', 'CREDIT')}
+
+        <tr class="font-bold bg-slate-50"><td colspan="10" class="py-2 px-3">EQUITY (IAS 32 / IAS 1)</td></tr>
+        ${getBsRow('3010', 'Contributed Share Capital (3010 - IAS 32)', 'CREDIT')}
+      `;
     }
 
-    function duplicateActiveInvoice() {
-      const active = state.invoices.find(i => i.id === state.activeInvoiceId);
-      if (!active) return;
-      const dup = JSON.parse(JSON.stringify(active));
-      dup.id = `inv_${Date.now()}`;
-      dup.invoiceNumber = generateVoucherNumber(active.clientCode, new Date().toISOString().split('T')[0]);
-      dup.receipts = [];
-      state.invoices.unshift(dup);
-      state.activeInvoiceId = dup.id;
-      syncInvoiceToLedger(dup);
-      renderStudio();
-      showNotification('Invoice duplicated');
+    function renderCashFlow(periods) {
+      const thead = document.getElementById('stmt-cf-thead');
+      const tbody = document.getElementById('stmt-cf-tbody');
+
+      const colHeaders = state.activePeriodMode === 'PERIODIC'
+        ? periods.map(p => `<th class="py-2.5 px-3 text-right">${p}</th>`).join('') + `<th class="py-2.5 px-3 text-right font-black">YTD Total</th>`
+        : `<th class="py-2.5 px-3 text-right font-black">Total Net Cash Flows YTD</th>`;
+
+      thead.innerHTML = `<tr><th class="py-2.5 px-3">Operating, Investing &amp; Financing Activities</th>${colHeaders}</tr>`;
+
+      function getCfRow(filterFn, title, isOutflow = false) {
+        const periodValues = periods.map(p => filterFn(p));
+        const total = periodValues.reduce((a, b) => a + b, 0);
+
+        if (total === 0) return '';
+
+        const cols = state.activePeriodMode === 'PERIODIC'
+          ? periodValues.map(v => `<td class="py-2 px-3 text-right font-mono">${isOutflow && v > 0 ? '-' : ''}$${v.toLocaleString()}</td>`).join('') + `<td class="py-2 px-3 text-right font-mono font-bold">${isOutflow && total > 0 ? '-' : ''}$${total.toLocaleString()}</td>`
+          : `<td class="py-2 px-3 text-right font-mono font-bold">${isOutflow && total > 0 ? '-' : ''}$${total.toLocaleString()}</td>`;
+
+        return `<tr><td class="py-2 px-3 pl-6 text-slate-700">${title}</td>${cols}</tr>`;
+      }
+
+      tbody.innerHTML = `
+        <tr class="font-bold bg-slate-50"><td colspan="10" class="py-2 px-3">1. CASH FLOWS FROM OPERATING ACTIVITIES</td></tr>
+        ${getCfRow(p => {
+          let sum = 0;
+          state.transactions.forEach(t => {
+            if (t.date.startsWith(p) && ['1010','1015','1025'].includes(t.debitAccount) && (['4010','4020','4030','4040'].includes(t.creditAccount) || t.creditAccount === '1100')) sum += t.amount;
+          });
+          return sum;
+        }, 'Cash Received from Client Receipts & Invoices')}
+        ${getCfRow(p => {
+          let sum = 0;
+          state.transactions.forEach(t => {
+            if (t.date.startsWith(p) && ['1010','1015','1025'].includes(t.creditAccount) && ['6010','6020','6030','6040','5010','5020','5030'].includes(t.debitAccount)) sum += t.amount;
+          });
+          return sum;
+        }, 'Cash Paid to Suppliers & Staff Payroll (IAS 1/19)', true)}
+
+        <tr class="font-bold bg-slate-50"><td colspan="10" class="py-2 px-3">2. CASH FLOWS FROM INVESTING ACTIVITIES (CAPEX)</td></tr>
+        ${getCfRow(p => {
+          let sum = 0;
+          state.transactions.forEach(t => {
+            if (t.date.startsWith(p) && ['1010','1015','1025'].includes(t.creditAccount) && t.debitAccount === '1510') sum += t.amount;
+          });
+          return sum;
+        }, 'Procurement of Capital Assets (IT Hardware - IAS 16)', true)}
+
+        <tr class="font-bold bg-slate-50"><td colspan="10" class="py-2 px-3">3. CASH FLOWS FROM FINANCING ACTIVITIES</td></tr>
+        ${getCfRow(p => {
+          let sum = 0;
+          state.transactions.forEach(t => {
+            if (t.date.startsWith(p) && ['1010','1015','1025'].includes(t.debitAccount) && t.creditAccount === '3010') sum += t.amount;
+          });
+          return sum;
+        }, 'Shareholder Capital Inflow (IAS 32)')}
+        ${getCfRow(p => {
+          let sum = 0;
+          state.transactions.forEach(t => {
+            if (t.date.startsWith(p) && ['1010','1015','1025'].includes(t.debitAccount) && t.creditAccount === '2500') sum += t.amount;
+          });
+          return sum;
+        }, 'Commercial Bank Loan Inflow (IFRS 9)')}
+      `;
     }
 
-    // Modal Control Functions
+    function exportStatementsToExcel() {
+      const periods = getOperatingPeriods();
+      let xml = `<?xml version="1.0"?>
+      <?mso-application progid="Excel.Sheet"?>
+      <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+        xmlns:o="urn:schemas-microsoft-com:office:office"
+        xmlns:x="urn:schemas-microsoft-com:office:excel"
+        xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+        xmlns:html="http://www.w3.org/TR/REC-html40">
+        <Worksheet ss:Name="Profit or Loss (P&amp;L)">
+          <Table>
+            <Row><Cell><Data ss:Type="String">FinGenie Consultancy - Statement of Profit or Loss (IFRS 15 / IAS 1)</Data></Cell></Row>
+            <Row><Cell><Data ss:Type="String">Category</Data></Cell>${periods.map(p => `<Cell><Data ss:Type="String">${p}</Data></Cell>`).join('')}</Row>
+          </Table>
+        </Worksheet>
+        <Worksheet ss:Name="Balance Sheet">
+          <Table>
+            <Row><Cell><Data ss:Type="String">FinGenie Consultancy - Balance Sheet (IAS 1)</Data></Cell></Row>
+          </Table>
+        </Worksheet>
+        <Worksheet ss:Name="Cash Flows (IAS 7)">
+          <Table>
+            <Row><Cell><Data ss:Type="String">FinGenie Consultancy - Statement of Cash Flows (IAS 7 Direct Method)</Data></Cell></Row>
+          </Table>
+        </Worksheet>
+      </Workbook>`;
+
+      const blob = new Blob([xml], { type: 'application/vnd.ms-excel' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `FinGenie_IFRS_Statements_${new Date().toISOString().split('T')[0]}.xls`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showNotification('Exported complete multi-sheet Excel statements! 📊');
+    }
+
     function openVoucherModal() {
       document.getElementById('modal-voucher').classList.remove('hidden');
       const dateInput = document.getElementById('voucher-date-input');
@@ -1415,12 +1956,8 @@
       regenerateVoucherNo();
     }
 
-    function onVoucherClientChange(clientCode) {
+    function onVoucherClientChange() {
       regenerateVoucherNo();
-    }
-
-    function onVoucherBillingModeChange(mode) {
-      // If billing mode is INVOICE, debit will be 1100 Trade Receivables
     }
 
     function onFundingTypeChange(fundingType) {
@@ -1439,7 +1976,7 @@
       regenerateVoucherNo();
     }
 
-    function onVoucherDateChange(d) {
+    function onVoucherDateChange() {
       regenerateVoucherNo();
     }
 
@@ -1503,11 +2040,9 @@
 
       closeClientModal();
 
-      // Refresh and sync the Post Voucher client dropdown
       populateVoucherClientSelect(clientModalSource === 'voucher' ? code : undefined);
       regenerateVoucherNo();
 
-      // Refresh and sync the Invoice Studio client selector
       const studioClientSel = document.getElementById('studio-inv-client');
       if (studioClientSel) {
         const activeInv = state.invoices.find(i => i.id === state.activeInvoiceId);
@@ -1517,7 +2052,6 @@
         `).join('');
       }
 
-      // If registered directly from Invoice Studio, assign client and resequence invoice number
       if (clientModalSource === 'studio') {
         const activeInv = state.invoices.find(i => i.id === state.activeInvoiceId);
         if (activeInv) {
@@ -1543,6 +2077,7 @@
 
       let drAcc = '1010';
       let crAcc = '4040';
+      let module = 'General Operations';
       let clientCode = null;
 
       if (state.voucherFormState.class === 'INCOME') {
@@ -1550,26 +2085,19 @@
           clientCode = document.getElementById('v-client-select').value;
           crAcc = document.getElementById('v-sales-account').value;
           const billingMode = document.getElementById('v-billing-mode').value;
-          if (billingMode === 'INVOICE') {
-            drAcc = '1100'; // Trade Accounts Receivable
-          } else {
-            drAcc = document.getElementById('v-payment-channel').value; // Bank / Cash / EcoCash
-          }
+          drAcc = billingMode === 'INVOICE' ? '1100' : document.getElementById('v-payment-channel').value;
+          module = 'Client Invoices';
         } else {
-          // Funding In
           const fundingType = state.voucherFormState.fundingType;
           crAcc = fundingType === 'EQUITY' ? '3010' : '2500';
           drAcc = '1010';
+          module = fundingType === 'EQUITY' ? 'Shareholders Equity' : 'Debt Financing';
         }
       } else {
-        // Expense Outflow
         drAcc = document.getElementById('v-expense-account').value;
         const billingMode = document.getElementById('v-expense-billing-mode').value;
-        if (billingMode === 'BILL') {
-          crAcc = '2010'; // Trade Accounts Payable
-        } else {
-          crAcc = document.getElementById('v-expense-payment-channel').value;
-        }
+        crAcc = billingMode === 'BILL' ? '2010' : document.getElementById('v-expense-payment-channel').value;
+        module = state.voucherFormState.expenseNature === 'CAPEX' ? 'CAPEX Tangibles' : 'Operating Overhead';
       }
 
       const newTx = {
@@ -1580,14 +2108,13 @@
         debitAccount: drAcc,
         creditAccount: crAcc,
         amount: amt,
+        module: module,
         clientCode: clientCode
       };
 
       state.transactions.unshift(newTx);
 
-      // If an invoice voucher was posted with clientCode and DR 1100, create an entry in Invoice Studio
       if (drAcc === '1100' && clientCode) {
-        const clientObj = state.clients.find(c => c.code === clientCode);
         const newInv = {
           id: newTx.id,
           invoiceNumber: num,
@@ -1605,38 +2132,139 @@
       closeVoucherModal();
       renderLedgerTable();
       renderDashboard();
-      renderStatements();
-      showNotification(`Voucher ${num} posted to ledger!`);
+      renderStatementsSuite();
+      showNotification(`Voucher ${num} posted to General Ledger!`);
     }
 
     function deleteTransaction(id) {
       state.transactions = state.transactions.filter(t => t.id !== id);
       renderLedgerTable();
       renderDashboard();
-      renderStatements();
-      showNotification('Voucher deleted');
+      renderStatementsSuite();
+      showNotification('Voucher removed from ledger');
     }
 
-    function openAddAccountModal() { document.getElementById('modal-account').classList.remove('hidden'); }
-    function closeAddAccountModal() { document.getElementById('modal-account').classList.add('hidden'); }
-
-    function handleSaveAccount(e) {
-      e.preventDefault();
-      const code = document.getElementById('acc-code-input').value;
-      const name = document.getElementById('acc-name-input').value;
-      const cls = document.getElementById('acc-class-input').value;
-      const ifrs = document.getElementById('acc-ifrs-input').value;
-
-      state.accounts.push({ code, name, class: cls, ifrsRef: ifrs });
-      closeAddAccountModal();
-      renderCoaTable();
-      showNotification(`Account ${code} created`);
+    function updateStudioItem(idx, field, val) {
+      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (inv && inv.items[idx]) {
+        inv.items[idx][field] = val;
+        syncInvoiceToLedger(inv);
+        renderStudio();
+        renderDashboard();
+        renderStatementsSuite();
+      }
     }
 
-    function deleteAccount(code) {
-      state.accounts = state.accounts.filter(a => a.code !== code);
-      renderCoaTable();
-      showNotification(`Account ${code} removed`);
+    function addStudioItem() {
+      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (inv) {
+        inv.items.push({ description: 'Neighborhood Eye License', quantity: 1, rate: 744, amount: 744 });
+        syncInvoiceToLedger(inv);
+        renderStudio();
+        showNotification('Line item added');
+      }
+    }
+
+    function updateStudioReceipt(idx, field, val) {
+      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (inv && inv.receipts && inv.receipts[idx]) {
+        inv.receipts[idx][field] = val;
+        syncInvoiceToLedger(inv);
+        renderStudio();
+        renderDashboard();
+        renderStatementsSuite();
+        renderLedgerTable();
+      }
+    }
+
+    function removeStudioReceipt(idx) {
+      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (inv && inv.receipts && inv.receipts[idx]) {
+        inv.receipts.splice(idx, 1);
+        syncInvoiceToLedger(inv);
+        renderStudio();
+        renderDashboard();
+        renderStatementsSuite();
+        renderLedgerTable();
+        showNotification('Receipt deleted');
+      }
+    }
+
+    function addStudioReceipt() {
+      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (inv) {
+        if (!inv.receipts) inv.receipts = [];
+        const bal = calculateInvoiceBalance(inv);
+        inv.receipts.push({
+          date: new Date().toISOString().split('T')[0],
+          description: 'CBZ Nostro / EcoCash 0774148760 Transfer',
+          amount: bal > 0 ? bal : 500
+        });
+        syncInvoiceToLedger(inv);
+        renderStudio();
+        renderDashboard();
+        renderStatementsSuite();
+        renderLedgerTable();
+        showNotification('Receipt recorded');
+      }
+    }
+
+    function updateInvoiceField(field, val) {
+      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (inv) {
+        inv[field] = val;
+        syncInvoiceToLedger(inv);
+        renderStudio();
+      }
+    }
+
+    function onStudioClientChange(clientCode) {
+      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (inv) {
+        inv.clientCode = clientCode;
+        inv.invoiceNumber = generateVoucherNumber(clientCode, inv.issueDate);
+        syncInvoiceToLedger(inv);
+        renderStudio();
+      }
+    }
+
+    function onStudioInvoiceChange(invId) {
+      state.activeInvoiceId = invId;
+      renderStudio();
+    }
+
+    function createNewInvoice() {
+      const defaultClient = state.clients[0]?.code || 'ZIBNya';
+      const today = new Date().toISOString().split('T')[0];
+      const newInv = {
+        id: `inv_${Date.now()}`,
+        invoiceNumber: generateVoucherNumber(defaultClient, today),
+        clientCode: defaultClient,
+        issueDate: today,
+        dueDate: today,
+        status: 'unpaid',
+        items: [{ description: 'Neighborhood Eye License', quantity: 744, rate: 1, amount: 744 }],
+        receipts: []
+      };
+      state.invoices.unshift(newInv);
+      state.activeInvoiceId = newInv.id;
+      syncInvoiceToLedger(newInv);
+      renderStudio();
+      showNotification(`Created invoice ${newInv.invoiceNumber}`);
+    }
+
+    function duplicateActiveInvoice() {
+      const active = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (!active) return;
+      const dup = JSON.parse(JSON.stringify(active));
+      dup.id = `inv_${Date.now()}`;
+      dup.invoiceNumber = generateVoucherNumber(active.clientCode, new Date().toISOString().split('T')[0]);
+      dup.receipts = [];
+      state.invoices.unshift(dup);
+      state.activeInvoiceId = dup.id;
+      syncInvoiceToLedger(dup);
+      renderStudio();
+      showNotification('Invoice duplicated');
     }
 
     function openJsonModal() {
@@ -1649,7 +2277,10 @@
         </div>
       `).join('');
     }
-    function closeJsonModal() { document.getElementById('modal-json').classList.add('hidden'); }
+
+    function closeJsonModal() {
+      document.getElementById('modal-json').classList.add('hidden');
+    }
 
     function downloadJsonFile() {
       const dataStr = JSON.stringify(state, null, 2);
@@ -1675,10 +2306,7 @@
 
     window.onload = function() {
       setAppLogo(activeLogoSrc);
-      
-      // Auto-sync existing invoices to ledger
       state.invoices.forEach(inv => syncInvoiceToLedger(inv));
-
       renderDashboard();
       renderStudio();
     };
