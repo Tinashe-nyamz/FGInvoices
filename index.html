@@ -37,6 +37,31 @@
     }
   </script>
 
+  <script>
+    // Fallback high-fidelity SVG representation if image path is not found
+    const FINGENIE_LOGO_FALLBACK = `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+        <circle cx="250" cy="250" r="236" fill="none" stroke="#004EB4" stroke-width="32" />
+        <circle cx="250" cy="250" r="220" fill="#FFFFFF" />
+        <path d="M 230 145 C 170 145 140 185 140 250 C 140 315 170 355 230 355 C 275 355 315 330 335 295 L 350 325 C 325 370 275 395 215 395 C 130 395 95 335 95 250 C 95 165 130 105 215 105 C 245 105 285 115 315 135 L 295 168 C 275 152 250 145 230 145 Z" fill="#004EB4" />
+        <path d="M 275 240 L 350 240 L 350 350 L 275 350 Z" fill="#004EB4" />
+        <path d="M 225 165 C 225 130 255 125 280 125 L 365 125 L 350 165 L 295 165 C 280 165 270 170 270 185 L 270 355 L 225 355 Z" fill="#4EA5EC" />
+        <rect x="198" y="240" width="72" height="35" fill="#4EA5EC" />
+      </svg>
+    `)}`;
+
+    // Defined early so all img tags with onerror have immediate access
+    window.handleLogoFallback = function(imgElement) {
+      if (!imgElement) return;
+      if (window.activeLogoSrc && imgElement.src !== window.activeLogoSrc) {
+        imgElement.src = window.activeLogoSrc;
+      } else {
+        imgElement.onerror = null;
+        imgElement.src = FINGENIE_LOGO_FALLBACK;
+      }
+    };
+  </script>
+
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -93,6 +118,12 @@
 
     <!-- Right Header Controls -->
     <div class="flex items-center space-x-2.5">
+      <!-- Real-time Cloud Save Status Indicator -->
+      <div id="cloud-sync-status" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold" title="All activities auto-save to cloud storage">
+        <span id="cloud-sync-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="cloud-sync-text">Cloud Synced</span>
+      </div>
+
       <!-- Hidden logo file input -->
       <input type="file" id="direct-logo-file-input" accept="image/*" class="hidden" onchange="handleLogoFileInput(event)" />
       <button onclick="document.getElementById('direct-logo-file-input').click()" class="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-bold border border-slate-300 transition" title="Upload company logo">
@@ -211,6 +242,16 @@
             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
             <span>New Invoice</span>
           </button>
+          <!-- Save Invoice Draft Button -->
+          <button onclick="saveActiveInvoiceDraft()" class="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-300 transition" title="Save invoice details locally before posting to ledger">
+            <svg class="h-4 w-4 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>Save Invoice</span>
+          </button>
+          <!-- Explicit Post to GL Button -->
+          <button id="btn-post-invoice-gl" onclick="postActiveInvoiceToGL()" class="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow transition" title="Post verified invoice as an identifiable voucher into General Ledger">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span id="btn-post-invoice-gl-label">Post to GL Vouchers</span>
+          </button>
           <button onclick="document.getElementById('direct-logo-file-input').click()" class="flex items-center space-x-1 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-300 transition" title="Change or re-upload invoice logo">
             <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <span>Upload Logo</span>
@@ -219,6 +260,38 @@
             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
             <span>Print / Save PDF</span>
           </button>
+        </div>
+      </div>
+
+      <!-- Invoices Directory / Register Accordion Panel -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3 print:hidden">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-black uppercase text-slate-700 tracking-wider">📁 Saved Invoices Register (<span id="invoice-register-count">1</span>)</span>
+            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">Select any invoice to inspect, edit, or post</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="text" id="invoice-register-search" oninput="renderInvoiceRegisterTable()" placeholder="Search saved invoices..." class="px-2.5 py-1 text-xs border border-slate-300 rounded-lg" />
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 font-bold uppercase border-b border-slate-200">
+                <th class="py-2 px-3">Invoice #</th>
+                <th class="py-2 px-3">Client</th>
+                <th class="py-2 px-3">Issue Date</th>
+                <th class="py-2 px-3 text-right">Total ($)</th>
+                <th class="py-2 px-3 text-right">Balance Due</th>
+                <th class="py-2 px-3 text-center">GL Status</th>
+                <th class="py-2 px-3 text-center">Settlement</th>
+                <th class="py-2 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invoice-register-tbody" class="divide-y divide-slate-100">
+              <!-- Dynamically populated from state.invoices -->
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -936,7 +1009,19 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Cloud Environment Config & Variables
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'fingenie-accounting-erp';
+    let db = null;
+    let auth = null;
+    let currentUser = null;
+    let isCloudSyncActive = false;
+    let cloudSaveTimeout = null;
+
     // IFRS Standards Master Directory mapped conditionally to account classes with comprehensive explanations
     const IFRS_STANDARDS_BY_CLASS = {
       REVENUE: [
@@ -1066,19 +1151,8 @@
       ]
     };
 
-    // Fallback high-fidelity SVG representation if file path access is sandboxed
-    const FINGENIE_LOGO_FALLBACK = `data:image/svg+xml;utf8,${encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
-        <circle cx="250" cy="250" r="236" fill="none" stroke="#004EB4" stroke-width="32" />
-        <circle cx="250" cy="250" r="220" fill="#FFFFFF" />
-        <path d="M 230 145 C 170 145 140 185 140 250 C 140 315 170 355 230 355 C 275 355 315 330 335 295 L 350 325 C 325 370 275 395 215 395 C 130 395 95 335 95 250 C 95 165 130 105 215 105 C 245 105 285 115 315 135 L 295 168 C 275 152 250 145 230 145 Z" fill="#004EB4" />
-        <path d="M 275 240 L 350 240 L 350 350 L 275 350 Z" fill="#004EB4" />
-        <path d="M 225 165 C 225 130 255 125 280 125 L 365 125 L 350 165 L 295 165 C 280 165 270 170 270 185 L 270 355 L 225 355 Z" fill="#4EA5EC" />
-        <rect x="198" y="240" width="72" height="35" fill="#4EA5EC" />
-      </svg>
-    `)}`;
-
-    let activeLogoSrc = localStorage.getItem('fingenie_brand_logo') || 'Fingenie HD_2.jpg';
+    let activeLogoSrc = 'Fingenie HD_2.jpg';
+    window.activeLogoSrc = activeLogoSrc;
 
     // Application state
     const state = {
@@ -1127,6 +1201,7 @@
           issueDate: '2026-08-21',
           dueDate: '2026-08-26',
           status: 'unpaid',
+          isPostedToGL: true,
           items: [{ description: 'Neighborhood Eye- Nyabira for July 2026', quantity: 744, rate: 1, amount: 744 }],
           receipts: []
         }
@@ -1145,22 +1220,145 @@
       }
     };
 
+    async function initCloudStorage() {
+      if (typeof __firebase_config === 'undefined') {
+        updateSyncBadge('ready', 'Session Mode');
+        return;
+      }
+
+      try {
+        updateSyncBadge('saving', 'Connecting...');
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        // RULE 3: Auth Before Queries
+        let cred;
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          cred = await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          cred = await signInAnonymously(auth);
+        }
+        currentUser = cred.user;
+        if (!currentUser) return;
+
+        // RULE 1: Strict collection path /artifacts/{appId}/public/data/{collectionName}
+        const stateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'erp_state', 'current_state');
+
+        // RULE 2: Direct document stream with mandatory error callback
+        onSnapshot(stateDocRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data && data.state) {
+              // Apply retrieved cloud state across entire ERP
+              if (Array.isArray(data.state.clients)) state.clients = data.state.clients;
+              if (Array.isArray(data.state.accounts)) state.accounts = data.state.accounts;
+              if (Array.isArray(data.state.transactions)) state.transactions = data.state.transactions;
+              if (Array.isArray(data.state.invoices)) state.invoices = data.state.invoices;
+              if (data.state.activeInvoiceId) state.activeInvoiceId = data.state.activeInvoiceId;
+              if (Array.isArray(data.state.checkpoints)) state.checkpoints = data.state.checkpoints;
+              if (data.activeLogoSrc) {
+                setAppLogo(data.activeLogoSrc);
+              }
+
+              // Re-render components with newly restored cloud records
+              renderDashboard();
+              renderStudio();
+              renderLedgerTable();
+              renderCoaTable();
+              renderStatementsSuite();
+              updateSyncBadge('synced', 'Cloud Synced');
+            }
+          } else {
+            // First run on new deployment: automatically initialize cloud backup
+            saveStateToCloud(true);
+          }
+        }, (error) => {
+          console.error("Cloud storage sync error:", error);
+          updateSyncBadge('error', 'Cloud Offline');
+        });
+
+        isCloudSyncActive = true;
+      } catch (err) {
+        console.error("Cloud storage initialization failed:", err);
+        updateSyncBadge('error', 'Cloud Error');
+      }
+    }
+
+    async function saveStateToCloud(immediate = false) {
+      if (!db || !currentUser || !isCloudSyncActive) return;
+
+      const performSave = async () => {
+        try {
+          updateSyncBadge('saving', 'Saving to Cloud...');
+          const stateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'erp_state', 'current_state');
+          
+          const payload = {
+            state: {
+              clients: state.clients,
+              accounts: state.accounts,
+              transactions: state.transactions,
+              invoices: state.invoices,
+              activeInvoiceId: state.activeInvoiceId,
+              checkpoints: state.checkpoints
+            },
+            activeLogoSrc: activeLogoSrc,
+            updatedAt: new Date().toISOString()
+          };
+
+          await setDoc(stateDocRef, payload);
+          updateSyncBadge('synced', 'Cloud Synced');
+        } catch (err) {
+          console.error("Failed to commit state to cloud storage:", err);
+          updateSyncBadge('error', 'Save Failed');
+        }
+      };
+
+      if (immediate) {
+        if (cloudSaveTimeout) clearTimeout(cloudSaveTimeout);
+        await performSave();
+      } else {
+        if (cloudSaveTimeout) clearTimeout(cloudSaveTimeout);
+        updateSyncBadge('saving', 'Pending Save...');
+        cloudSaveTimeout = setTimeout(performSave, 500);
+      }
+    }
+
+    function updateSyncBadge(status, customText = null) {
+      const badge = document.getElementById('cloud-sync-status');
+      const dot = document.getElementById('cloud-sync-dot');
+      const text = document.getElementById('cloud-sync-text');
+      if (!badge || !dot || !text) return;
+
+      if (status === 'saving') {
+        badge.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold';
+        dot.className = 'w-2 h-2 rounded-full bg-amber-500 animate-ping';
+        text.textContent = customText || 'Saving to Cloud...';
+      } else if (status === 'synced') {
+        badge.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold';
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+        text.textContent = customText || 'Cloud Synced';
+      } else if (status === 'error') {
+        badge.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold';
+        dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+        text.textContent = customText || 'Cloud Offline';
+      } else {
+        badge.className = 'flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold';
+        dot.className = 'w-2 h-2 rounded-full bg-slate-400';
+        text.textContent = customText || 'Session Ready';
+      }
+    }
+
     function setAppLogo(src) {
       activeLogoSrc = src;
+      window.activeLogoSrc = src;
       const navLogo = document.getElementById('nav-brand-logo');
       const pdfLogo = document.getElementById('pdf-doc-logo');
       const modalPreview = document.getElementById('modal-logo-preview');
       if (navLogo) navLogo.src = src;
       if (pdfLogo) pdfLogo.src = src;
       if (modalPreview) modalPreview.src = src;
-    }
-
-    function handleLogoFallback(imgElement) {
-      if (imgElement.src.includes('Fingenie HD_2.jpg')) {
-        imgElement.src = 'Fingenie HD.jpg';
-      } else if (!imgElement.src.startsWith('data:')) {
-        imgElement.src = FINGENIE_LOGO_FALLBACK;
-      }
     }
 
     function openLogoModal() {
@@ -1178,20 +1376,18 @@
       const reader = new FileReader();
       reader.onload = function(evt) {
         const result = evt.target.result;
-        try {
-          localStorage.setItem('fingenie_brand_logo', result);
-        } catch (err) {}
         setAppLogo(result);
         closeLogoModal();
-        showNotification('FinGenie logo updated successfully!');
+        saveStateToCloud(true);
+        showNotification('FinGenie logo updated and saved to cloud storage!');
       };
       reader.readAsDataURL(file);
     }
 
     function resetLogoToOriginal() {
-      localStorage.removeItem('fingenie_brand_logo');
       setAppLogo('Fingenie HD_2.jpg');
       closeLogoModal();
+      saveStateToCloud(true);
       showNotification('Reset to original Fingenie HD_2.jpg');
     }
 
@@ -1225,7 +1421,7 @@
     }
 
     function calculateInvoiceTotal(inv) {
-      return (inv.items || []).reduce((acc, it) => acc + (it.quantity * it.rate), 0);
+      return (inv.items || []).reduce((acc, it) => acc + ((Number(it.quantity) || 0) * (Number(it.rate) || 0)), 0);
     }
 
     function calculateInvoicePaid(inv) {
@@ -1237,6 +1433,11 @@
     }
 
     function syncInvoiceToLedger(inv) {
+      if (!inv.isPostedToGL) {
+        state.transactions = state.transactions.filter(t => t.linkedInvoiceId !== inv.id && t.id !== inv.id);
+        return;
+      }
+
       const total = calculateInvoiceTotal(inv);
       const paid = calculateInvoicePaid(inv);
       const bal = calculateInvoiceBalance(inv);
@@ -1259,7 +1460,7 @@
         id: `${inv.id}-rc-${idx}`,
         voucherNo: `#RC_${inv.invoiceNumber.replace('#','')}_${idx + 1}`,
         date: r.date,
-        description: `Settlement Payment for ${inv.invoiceNumber}`,
+        description: `Settlement Payment for ${inv.invoiceNumber} (${r.description || 'Nostro'})`,
         debitAccount: '1010',
         creditAccount: '1100',
         amount: Number(r.amount),
@@ -1268,6 +1469,281 @@
       }));
 
       state.transactions = [mainTx, ...receiptTxs, ...state.transactions];
+    }
+
+    function saveActiveInvoiceDraft() {
+      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (!inv) return;
+      showNotification(`Invoice ${inv.invoiceNumber} saved! Stored in cloud database.`);
+      renderStudio();
+      renderInvoiceRegisterTable();
+      saveStateToCloud(true);
+    }
+
+    function postActiveInvoiceToGL() {
+      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (!inv) return;
+      inv.isPostedToGL = true;
+      syncInvoiceToLedger(inv);
+      renderStudio();
+      renderInvoiceRegisterTable();
+      renderLedgerTable();
+      renderDashboard();
+      renderStatementsSuite();
+      saveStateToCloud(true);
+      showNotification(`Invoice ${inv.invoiceNumber} posted to General Ledger & saved to cloud! ⚖️`);
+    }
+
+    function unpostActiveInvoiceFromGL(invId) {
+      const targetId = invId || state.activeInvoiceId;
+      const inv = state.invoices.find(i => i.id === targetId);
+      if (!inv) return;
+      inv.isPostedToGL = false;
+      syncInvoiceToLedger(inv);
+      renderStudio();
+      renderInvoiceRegisterTable();
+      renderLedgerTable();
+      renderDashboard();
+      renderStatementsSuite();
+      saveStateToCloud(true);
+      showNotification(`Invoice ${inv.invoiceNumber} retracted to Draft. General Ledger updated.`);
+    }
+
+    function renderInvoiceRegisterTable() {
+      const q = (document.getElementById('invoice-register-search')?.value || '').toLowerCase();
+      const tbody = document.getElementById('invoice-register-tbody');
+      const countEl = document.getElementById('invoice-register-count');
+      if (countEl) countEl.textContent = state.invoices.length;
+
+      if (!tbody) return;
+
+      const filtered = state.invoices.filter(i => {
+        const client = state.clients.find(c => c.code === i.clientCode);
+        return i.invoiceNumber.toLowerCase().includes(q) ||
+               (client?.name || '').toLowerCase().includes(q) ||
+               (i.clientCode || '').toLowerCase().includes(q);
+      });
+
+      tbody.innerHTML = filtered.map(inv => {
+        const client = state.clients.find(c => c.code === inv.clientCode);
+        const total = calculateInvoiceTotal(inv);
+        const bal = calculateInvoiceBalance(inv);
+        const isCurrent = inv.id === state.activeInvoiceId;
+
+        const glBadge = inv.isPostedToGL
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">✓ In GL</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">📝 Draft</span>`;
+
+        let settBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700">UNPAID</span>`;
+        if (bal <= 0) settBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700">PAID</span>`;
+        else if (bal < total) settBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700">PARTIAL</span>`;
+
+        return `
+          <tr class="hover:bg-blue-50/50 transition cursor-pointer ${isCurrent ? 'bg-blue-50/70 font-semibold' : ''}" onclick="onStudioInvoiceChange('${inv.id}')">
+            <td class="py-2.5 px-3 font-mono font-bold text-blue-700">${inv.invoiceNumber}</td>
+            <td class="py-2.5 px-3">${client?.name || inv.clientCode}</td>
+            <td class="py-2.5 px-3 text-slate-500">${inv.issueDate}</td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold">$${total.toLocaleString()}</td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold text-amber-700">$${bal.toLocaleString()}</td>
+            <td class="py-2.5 px-3 text-center">${glBadge}</td>
+            <td class="py-2.5 px-3 text-center">${settBadge}</td>
+            <td class="py-2.5 px-3 text-right space-x-1" onclick="event.stopPropagation()">
+              <button onclick="onStudioInvoiceChange('${inv.id}')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-blue-100 text-blue-700 font-bold text-[11px]" title="Edit in Studio">Edit</button>
+              ${inv.isPostedToGL
+                ? `<button onclick="unpostActiveInvoiceFromGL('${inv.id}')" class="px-2 py-0.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-[11px]" title="Retract to Draft">Draft</button>`
+                : `<button onclick="state.activeInvoiceId='${inv.id}'; postActiveInvoiceToGL();" class="px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-[11px]" title="Post to General Ledger">Post</button>`
+              }
+              <button onclick="deleteInvoice('${inv.id}')" class="px-2 py-0.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px]" title="Delete Invoice">✕</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function handleStudioItemChange(idx, field, val) {
+      const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (!inv || !inv.items[idx]) return;
+
+      if (field === 'description') {
+        inv.items[idx].description = val;
+      } else if (field === 'quantity') {
+        inv.items[idx].quantity = parseFloat(val) || 0;
+      } else if (field === 'rate') {
+        inv.items[idx].rate = parseFloat(val) || 0;
+      }
+
+      const itemQty = Number(inv.items[idx].quantity) || 0;
+      const itemRate = Number(inv.items[idx].rate) || 0;
+      inv.items[idx].amount = itemQty * itemRate;
+
+      const amtEl = document.getElementById(`studio-item-amt-${idx}`);
+      if (amtEl) {
+        amtEl.textContent = `$${inv.items[idx].amount.toLocaleString()}`;
+      }
+
+      refreshStudioTotalsAndPDF(inv);
+
+      if (inv.isPostedToGL) {
+        syncInvoiceToLedger(inv);
+        renderDashboard();
+        renderStatementsSuite();
+        renderLedgerTable();
+      }
+      saveStateToCloud();
+    }
+
+    function refreshStudioTotalsAndPDF(inv) {
+      const total = calculateInvoiceTotal(inv);
+      const paid = calculateInvoicePaid(inv);
+      const bal = calculateInvoiceBalance(inv);
+
+      const totalEl = document.getElementById('pdf-doc-total');
+      const balEl = document.getElementById('pdf-doc-bal');
+      if (totalEl) totalEl.textContent = `$${total.toLocaleString()}`;
+      if (balEl) balEl.textContent = `$${bal.toLocaleString()}`;
+
+      const statusBadge = document.getElementById('pdf-doc-status');
+      if (statusBadge) {
+        if (bal <= 0) {
+          statusBadge.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-black uppercase bg-emerald-50 text-emerald-700 border border-emerald-200';
+          statusBadge.textContent = 'PAID IN FULL';
+        } else if (paid > 0) {
+          statusBadge.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-black uppercase bg-blue-50 text-blue-700 border border-blue-200';
+          statusBadge.textContent = 'PARTIALLY PAID';
+        } else {
+          statusBadge.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-black uppercase bg-amber-50 text-amber-700 border border-amber-200';
+          statusBadge.textContent = 'UNPAID';
+        }
+      }
+
+      const tbody = document.getElementById('pdf-doc-items-tbody');
+      if (tbody) {
+        tbody.innerHTML = inv.items.map(it => `
+          <tr>
+            <td class="py-3 px-3 font-semibold">${it.description}</td>
+            <td class="py-3 px-3 text-center">${it.quantity}</td>
+            <td class="py-3 px-3 text-right">$${Number(it.rate).toFixed(2)}</td>
+            <td class="py-3 px-3 text-right font-bold">$${((Number(it.quantity) || 0) * (Number(it.rate) || 0)).toLocaleString()}</td>
+          </tr>
+        `).join('');
+      }
+
+      renderInvoiceRegisterTable();
+    }
+
+    function renderStudio() {
+      const inv = state.invoices.find(i => i.id === state.activeInvoiceId) || state.invoices[0];
+      if (!inv) return;
+
+      const sel = document.getElementById('studio-invoice-select');
+      sel.innerHTML = state.invoices.map(i => `
+        <option value="${i.id}" ${i.id === inv.id ? 'selected' : ''}>
+          ${i.invoiceNumber} - ${i.clientCode} ($${calculateInvoiceTotal(i).toLocaleString()}) [${i.isPostedToGL ? 'POSTED' : 'DRAFT'}]
+        </option>
+      `).join('');
+
+      document.getElementById('studio-inv-num').value = inv.invoiceNumber;
+      document.getElementById('studio-inv-issuedate').value = inv.issueDate;
+      document.getElementById('studio-inv-duedate').value = inv.dueDate;
+
+      const clientSel = document.getElementById('studio-inv-client');
+      clientSel.innerHTML = state.clients.map(c => `
+        <option value="${c.code}" ${c.code === inv.clientCode ? 'selected' : ''}>${c.name}</option>
+      `).join('');
+
+      const glBtn = document.getElementById('btn-post-invoice-gl');
+      const glBtnLabel = document.getElementById('btn-post-invoice-gl-label');
+      if (glBtn && glBtnLabel) {
+        if (inv.isPostedToGL) {
+          glBtn.className = 'flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-100 text-emerald-700 text-xs font-bold border border-emerald-300 shadow-sm transition';
+          glBtnLabel.textContent = '✓ In General Ledger';
+        } else {
+          glBtn.className = 'flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow transition';
+          glBtnLabel.textContent = 'Post to GL Vouchers';
+        }
+      }
+
+      const itemsList = document.getElementById('studio-items-list');
+      itemsList.innerHTML = inv.items.map((it, idx) => `
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs" id="studio-item-card-${idx}">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-bold text-slate-500 text-[11px]">Item #${idx + 1}</span>
+            <button type="button" onclick="removeStudioItem(${idx})" class="p-1 text-slate-400 hover:text-rose-600 rounded transition" title="Delete Line Item">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            </button>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Description</label>
+            <input type="text" id="studio-item-desc-${idx}" value="${(it.description || '').replace(/"/g, '&quot;')}" oninput="handleStudioItemChange(${idx}, 'description', this.value)" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs" />
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Quantity</label>
+              <input type="number" step="any" min="0" id="studio-item-qty-${idx}" value="${it.quantity ?? 1}" oninput="handleStudioItemChange(${idx}, 'quantity', this.value)" class="w-full px-2 py-1 bg-white border border-slate-300 rounded-lg font-bold text-xs" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Rate ($)</label>
+              <input type="number" step="any" min="0" id="studio-item-rate-${idx}" value="${it.rate ?? 1}" oninput="handleStudioItemChange(${idx}, 'rate', this.value)" class="w-full px-2 py-1 bg-white border border-slate-300 rounded-lg font-bold text-xs" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Amount ($)</label>
+              <div id="studio-item-amt-${idx}" class="px-2 py-1.5 bg-slate-100 border border-slate-200 rounded-lg font-black text-slate-900 text-xs text-right">
+                $${((Number(it.quantity) || 0) * (Number(it.rate) || 0)).toLocaleString()}
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      const receiptsList = document.getElementById('studio-receipts-list');
+      receiptsList.innerHTML = (!inv.receipts || inv.receipts.length === 0)
+        ? '<div class="text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-xs text-slate-400">No receipts recorded yet. Click <strong>+ Record Receipt</strong> to add client payments.</div>'
+        : inv.receipts.map((r, idx) => `
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs transition">
+            <div class="flex items-center justify-between gap-2 pb-1 border-b border-slate-200">
+              <span class="font-bold text-emerald-800 text-[11px]">💳 Receipt #${idx + 1}</span>
+              <button type="button" onclick="removeStudioReceipt(${idx})" class="text-rose-500 hover:text-rose-700 p-1" title="Delete">✕</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Payment Date</label>
+                <input type="date" value="${r.date || ''}" onclick="safeShowPicker(event)" onchange="updateStudioReceipt(${idx}, 'date', this.value)" class="w-full px-2 py-1.5 bg-white border rounded-lg text-xs" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Amount Paid ($ USD)</label>
+                <input type="number" step="0.01" min="0" value="${r.amount ?? 0}" oninput="updateStudioReceipt(${idx}, 'amount', parseFloat(this.value) || 0)" class="w-full px-2 py-1.5 bg-white border rounded-lg text-xs font-bold text-emerald-700 font-mono" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Payment Details / Method / Ref</label>
+              <input type="text" value="${(r.description || '').replace(/"/g, '&quot;')}" placeholder="e.g. EcoCash 0774148760 / CBZ Nostro" oninput="updateStudioReceipt(${idx}, 'description', this.value)" class="w-full px-2.5 py-1.5 bg-white border rounded-lg text-xs" />
+            </div>
+          </div>
+        `).join('');
+
+      const client = state.clients.find(c => c.code === inv.clientCode) || state.clients[0];
+      document.getElementById('pdf-doc-number').textContent = inv.invoiceNumber;
+      document.getElementById('pdf-doc-client-name').textContent = client.name;
+      document.getElementById('pdf-doc-client-addr').textContent = client.address;
+      document.getElementById('pdf-doc-date').textContent = inv.issueDate;
+      document.getElementById('pdf-doc-duedate').textContent = inv.dueDate;
+
+      refreshStudioTotalsAndPDF(inv);
+
+      const receiptsCont = document.getElementById('pdf-doc-receipts-container');
+      const receiptsTbody = document.getElementById('pdf-doc-receipts-tbody');
+      if (inv.receipts && inv.receipts.length > 0) {
+        receiptsCont.classList.remove('hidden');
+        receiptsTbody.innerHTML = inv.receipts.map(r => `
+          <tr>
+            <td class="py-1.5 px-3">${r.date}</td>
+            <td class="py-1.5 px-3">${r.description}</td>
+            <td class="py-1.5 px-3 text-right font-bold text-emerald-700">$${Number(r.amount).toLocaleString()}</td>
+          </tr>
+        `).join('');
+      } else {
+        receiptsCont.classList.add('hidden');
+      }
     }
 
     function switchTab(tabId) {
@@ -1305,123 +1781,10 @@
       document.getElementById('kpi-profit').textContent = `$${(rev - opex).toLocaleString()}`;
     }
 
-    function renderStudio() {
-      const inv = state.invoices.find(i => i.id === state.activeInvoiceId) || state.invoices[0];
-      if (!inv) return;
-
-      const sel = document.getElementById('studio-invoice-select');
-      sel.innerHTML = state.invoices.map(i => `
-        <option value="${i.id}" ${i.id === inv.id ? 'selected' : ''}>
-          ${i.invoiceNumber} - ${i.clientCode} ($${calculateInvoiceTotal(i).toLocaleString()})
-        </option>
-      `).join('');
-
-      document.getElementById('studio-inv-num').value = inv.invoiceNumber;
-      document.getElementById('studio-inv-issuedate').value = inv.issueDate;
-      document.getElementById('studio-inv-duedate').value = inv.dueDate;
-
-      const clientSel = document.getElementById('studio-inv-client');
-      clientSel.innerHTML = state.clients.map(c => `
-        <option value="${c.code}" ${c.code === inv.clientCode ? 'selected' : ''}>${c.name}</option>
-      `).join('');
-
-      // Line items editor
-      const itemsList = document.getElementById('studio-items-list');
-      itemsList.innerHTML = inv.items.map((it, idx) => `
-        <div class="p-3 bg-slate-50 rounded-xl space-y-2 text-xs">
-          <input type="text" value="${it.description}" oninput="updateStudioItem(${idx}, 'description', this.value)" class="w-full px-2 py-1 bg-white border rounded" />
-          <div class="grid grid-cols-2 gap-2">
-            <input type="number" value="${it.rate}" oninput="updateStudioItem(${idx}, 'rate', Number(this.value))" class="px-2 py-1 bg-white border rounded font-bold" />
-            <div class="px-2 py-1 bg-slate-100 rounded font-bold">$${(it.quantity * it.rate).toLocaleString()}</div>
-          </div>
-        </div>
-      `).join('');
-
-      // Editable receipts editor
-      const receiptsList = document.getElementById('studio-receipts-list');
-      receiptsList.innerHTML = (!inv.receipts || inv.receipts.length === 0)
-        ? '<div class="text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-xs text-slate-400">No receipts recorded yet. Click <strong>+ Record Receipt</strong> to add client payments.</div>'
-        : inv.receipts.map((r, idx) => `
-          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs transition">
-            <div class="flex items-center justify-between gap-2 pb-1 border-b border-slate-200">
-              <span class="font-bold text-emerald-800 text-[11px]">💳 Receipt #${idx + 1}</span>
-              <button type="button" onclick="removeStudioReceipt(${idx})" class="text-rose-500 hover:text-rose-700 p-1" title="Delete">✕</button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div>
-                <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Payment Date</label>
-                <input type="date" value="${r.date || ''}" onclick="safeShowPicker(event)" onchange="updateStudioReceipt(${idx}, 'date', this.value)" class="w-full px-2 py-1.5 bg-white border rounded-lg text-xs" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Amount Paid ($ USD)</label>
-                <input type="number" step="0.01" min="0" value="${r.amount ?? 0}" oninput="updateStudioReceipt(${idx}, 'amount', parseFloat(this.value) || 0)" class="w-full px-2 py-1.5 bg-white border rounded-lg text-xs font-bold text-emerald-700 font-mono" />
-              </div>
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold text-slate-500 mb-0.5">Payment Details / Method / Ref</label>
-              <input type="text" value="${(r.description || '').replace(/"/g, '&quot;')}" placeholder="e.g. EcoCash 0774148760 / CBZ Nostro" oninput="updateStudioReceipt(${idx}, 'description', this.value)" class="w-full px-2.5 py-1.5 bg-white border rounded-lg text-xs" />
-            </div>
-          </div>
-        `).join('');
-
-      // PDF canvas rendering
-      const client = state.clients.find(c => c.code === inv.clientCode) || state.clients[0];
-      document.getElementById('pdf-doc-number').textContent = inv.invoiceNumber;
-      document.getElementById('pdf-doc-client-name').textContent = client.name;
-      document.getElementById('pdf-doc-client-addr').textContent = client.address;
-      document.getElementById('pdf-doc-date').textContent = inv.issueDate;
-      document.getElementById('pdf-doc-duedate').textContent = inv.dueDate;
-
-      const total = calculateInvoiceTotal(inv);
-      const paid = calculateInvoicePaid(inv);
-      const bal = calculateInvoiceBalance(inv);
-
-      document.getElementById('pdf-doc-total').textContent = `$${total.toLocaleString()}`;
-      document.getElementById('pdf-doc-bal').textContent = `$${bal.toLocaleString()}`;
-
-      const statusBadge = document.getElementById('pdf-doc-status');
-      if (bal <= 0) {
-        statusBadge.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-black uppercase bg-emerald-50 text-emerald-700 border border-emerald-200';
-        statusBadge.textContent = 'PAID IN FULL';
-      } else if (paid > 0) {
-        statusBadge.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-black uppercase bg-blue-50 text-blue-700 border border-blue-200';
-        statusBadge.textContent = 'PARTIALLY PAID';
-      } else {
-        statusBadge.className = 'inline-block mt-2 px-3 py-1 rounded-lg text-xs font-black uppercase bg-amber-50 text-amber-700 border border-amber-200';
-        statusBadge.textContent = 'UNPAID';
-      }
-
-      const tbody = document.getElementById('pdf-doc-items-tbody');
-      tbody.innerHTML = inv.items.map(it => `
-        <tr>
-          <td class="py-3 px-3 font-semibold">${it.description}</td>
-          <td class="py-3 px-3 text-center">${it.quantity}</td>
-          <td class="py-3 px-3 text-right">$${it.rate.toFixed(2)}</td>
-          <td class="py-3 px-3 text-right font-bold">$${(it.quantity * it.rate).toLocaleString()}</td>
-        </tr>
-      `).join('');
-
-      const receiptsCont = document.getElementById('pdf-doc-receipts-container');
-      const receiptsTbody = document.getElementById('pdf-doc-receipts-tbody');
-      if (inv.receipts && inv.receipts.length > 0) {
-        receiptsCont.classList.remove('hidden');
-        receiptsTbody.innerHTML = inv.receipts.map(r => `
-          <tr>
-            <td class="py-1.5 px-3">${r.date}</td>
-            <td class="py-1.5 px-3">${r.description}</td>
-            <td class="py-1.5 px-3 text-right font-bold text-emerald-700">$${Number(r.amount).toLocaleString()}</td>
-          </tr>
-        `).join('');
-      } else {
-        receiptsCont.classList.add('hidden');
-      }
-    }
-
     function renderLedgerTable() {
       const q = (document.getElementById('ledger-search-input')?.value || '').toLowerCase();
       const accFilter = document.getElementById('ledger-account-filter')?.value || 'ALL';
 
-      // Update account selector options
       const accSel = document.getElementById('ledger-account-filter');
       if (accSel && accSel.options.length <= 1) {
         state.accounts.forEach(a => {
@@ -1432,7 +1795,6 @@
         });
       }
 
-      // Sort chronological ascending for running balance calculation, then display
       const sortedTxs = [...state.transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
 
       let runningBal = 0;
@@ -1454,12 +1816,11 @@
         return { ...t, currentRunningBal: runningBal };
       });
 
-      // Filter by account and search query
       const filtered = txsWithRunning.filter(t => {
         const matchesAcc = accFilter === 'ALL' || t.debitAccount === accFilter || t.creditAccount === accFilter;
         const matchesQ = t.voucherNo.toLowerCase().includes(q) || t.description.toLowerCase().includes(q) || (t.module || '').toLowerCase().includes(q);
         return matchesAcc && matchesQ;
-      }).reverse(); // Display most recent first
+      }).reverse();
 
       document.getElementById('ledger-voucher-count').textContent = `${state.transactions.length} Vouchers`;
       const tbody = document.getElementById('ledger-tbody');
@@ -1578,12 +1939,14 @@
       state.accounts.push({ code, name, class: cls, subcategory: subcat, ifrsRef: ifrs, normalBalance: norm });
       closeAddAccountModal();
       renderCoaTable();
-      showNotification(`Account ${code} (${ifrs}) created!`);
+      saveStateToCloud(true);
+      showNotification(`Account ${code} (${ifrs}) created and saved to cloud!`);
     }
 
     function deleteAccount(code) {
       state.accounts = state.accounts.filter(a => a.code !== code);
       renderCoaTable();
+      saveStateToCloud(true);
       showNotification(`Account ${code} deleted.`);
     }
 
@@ -1640,7 +2003,7 @@
       state.transactions.forEach(t => {
         if (t.date) {
           const parts = t.date.split('-');
-          periodsSet.add(`${parts[0]}-${parts[1]}`); // YYYY-MM
+          periodsSet.add(`${parts[0]}-${parts[1]}`);
         }
       });
       return Array.from(periodsSet).sort();
@@ -1663,7 +2026,6 @@
 
       thead.innerHTML = `<tr><th class="py-2.5 px-3">Revenue &amp; Cost Category (Subcategories)</th>${colHeaders}</tr>`;
 
-      // Helper to compute subcategory balance
       function getSubcatRow(accCodes, title, isExpense = false) {
         const periodValues = periods.map(p => {
           let sum = 0;
@@ -1678,7 +2040,6 @@
 
         const totalYtd = periodValues.reduce((a, b) => a + b, 0);
 
-        // Zero-balance suppression rule
         if (totalYtd === 0) return '';
 
         const cols = state.activePeriodMode === 'PERIODIC'
@@ -1688,7 +2049,6 @@
         return `<tr><td class="py-2 px-3 pl-6 text-slate-700">${title}</td>${cols}</tr>`;
       }
 
-      // Compute summary totals for Gross & Net Profit
       function getSummaryRow(calcFn, title, rowClass = 'font-bold bg-slate-50') {
         const periodValues = periods.map(p => calcFn(p));
         const total = periodValues.reduce((a, b) => a + b, 0);
@@ -2061,6 +2421,7 @@
           renderStudio();
         }
       }
+      saveStateToCloud(true);
     }
 
     function handlePostVoucher(e) {
@@ -2122,6 +2483,7 @@
           issueDate: dt,
           dueDate: dt,
           status: 'unpaid',
+          isPostedToGL: true,
           items: [{ description: desc, quantity: 1, rate: amt, amount: amt }],
           receipts: []
         };
@@ -2133,7 +2495,8 @@
       renderLedgerTable();
       renderDashboard();
       renderStatementsSuite();
-      showNotification(`Voucher ${num} posted to General Ledger!`);
+      saveStateToCloud(true);
+      showNotification(`Voucher ${num} posted to General Ledger and saved to cloud!`);
     }
 
     function deleteTransaction(id) {
@@ -2141,28 +2504,100 @@
       renderLedgerTable();
       renderDashboard();
       renderStatementsSuite();
-      showNotification('Voucher removed from ledger');
+      saveStateToCloud(true);
+      showNotification('Voucher removed from ledger and cloud database');
     }
 
-    function updateStudioItem(idx, field, val) {
+    function removeStudioItem(idx) {
       const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
-      if (inv && inv.items[idx]) {
-        inv.items[idx][field] = val;
-        syncInvoiceToLedger(inv);
-        renderStudio();
+      if (!inv) return;
+      if (inv.items.length <= 1) {
+        showNotification('An invoice must have at least one line item. You can edit the description or rate instead.');
+        return;
+      }
+      inv.items.splice(idx, 1);
+      syncInvoiceToLedger(inv);
+      renderStudio();
+      if (inv.isPostedToGL) {
         renderDashboard();
         renderStatementsSuite();
+        renderLedgerTable();
       }
+      saveStateToCloud(true);
+      showNotification('Line item removed successfully');
     }
 
     function addStudioItem() {
       const inv = state.invoices.find(i => i.id === state.activeInvoiceId);
       if (inv) {
-        inv.items.push({ description: 'Neighborhood Eye License', quantity: 1, rate: 744, amount: 744 });
+        inv.items.push({ description: 'Neighborhood Eye Platform License', quantity: 1, rate: 1, amount: 1 });
         syncInvoiceToLedger(inv);
         renderStudio();
+        saveStateToCloud(true);
         showNotification('Line item added');
       }
+    }
+
+    function deleteInvoice(id) {
+      if (state.invoices.length <= 1) {
+        showNotification('Cannot delete the last remaining invoice');
+        return;
+      }
+      const inv = state.invoices.find(i => i.id === id);
+      state.invoices = state.invoices.filter(i => i.id !== id);
+      state.transactions = state.transactions.filter(t => t.linkedInvoiceId !== id && t.id !== id);
+      if (state.activeInvoiceId === id) {
+        state.activeInvoiceId = state.invoices[0].id;
+      }
+      renderStudio();
+      renderInvoiceRegisterTable();
+      renderLedgerTable();
+      renderDashboard();
+      renderStatementsSuite();
+      saveStateToCloud(true);
+      showNotification(`Invoice ${inv?.invoiceNumber || ''} removed.`);
+    }
+
+    function onStudioInvoiceChange(invId) {
+      state.activeInvoiceId = invId;
+      renderStudio();
+      saveStateToCloud();
+    }
+
+    function createNewInvoice() {
+      const defaultClient = state.clients[0]?.code || 'ZIBNya';
+      const today = new Date().toISOString().split('T')[0];
+      const newInv = {
+        id: `inv_${Date.now()}`,
+        invoiceNumber: generateVoucherNumber(defaultClient, today),
+        clientCode: defaultClient,
+        issueDate: today,
+        dueDate: today,
+        status: 'unpaid',
+        isPostedToGL: false,
+        items: [{ description: 'Neighborhood Eye License', quantity: 1, rate: 744, amount: 744 }],
+        receipts: []
+      };
+      state.invoices.unshift(newInv);
+      state.activeInvoiceId = newInv.id;
+      renderStudio();
+      saveStateToCloud(true);
+      showNotification(`Created draft invoice ${newInv.invoiceNumber}. Saved to cloud.`);
+    }
+
+    function duplicateActiveInvoice() {
+      const active = state.invoices.find(i => i.id === state.activeInvoiceId);
+      if (!active) return;
+      const dup = JSON.parse(JSON.stringify(active));
+      dup.id = `inv_${Date.now()}`;
+      dup.invoiceNumber = generateVoucherNumber(active.clientCode, new Date().toISOString().split('T')[0]);
+      dup.receipts = [];
+      dup.isPostedToGL = false;
+      state.invoices.unshift(dup);
+      state.activeInvoiceId = dup.id;
+      renderStudio();
+      saveStateToCloud(true);
+      showNotification('Invoice duplicated as Draft and saved to cloud.');
     }
 
     function updateStudioReceipt(idx, field, val) {
@@ -2174,6 +2609,7 @@
         renderDashboard();
         renderStatementsSuite();
         renderLedgerTable();
+        saveStateToCloud();
       }
     }
 
@@ -2186,6 +2622,7 @@
         renderDashboard();
         renderStatementsSuite();
         renderLedgerTable();
+        saveStateToCloud(true);
         showNotification('Receipt deleted');
       }
     }
@@ -2205,7 +2642,8 @@
         renderDashboard();
         renderStatementsSuite();
         renderLedgerTable();
-        showNotification('Receipt recorded');
+        saveStateToCloud(true);
+        showNotification('Receipt recorded and saved to cloud');
       }
     }
 
@@ -2215,6 +2653,7 @@
         inv[field] = val;
         syncInvoiceToLedger(inv);
         renderStudio();
+        saveStateToCloud();
       }
     }
 
@@ -2225,46 +2664,8 @@
         inv.invoiceNumber = generateVoucherNumber(clientCode, inv.issueDate);
         syncInvoiceToLedger(inv);
         renderStudio();
+        saveStateToCloud(true);
       }
-    }
-
-    function onStudioInvoiceChange(invId) {
-      state.activeInvoiceId = invId;
-      renderStudio();
-    }
-
-    function createNewInvoice() {
-      const defaultClient = state.clients[0]?.code || 'ZIBNya';
-      const today = new Date().toISOString().split('T')[0];
-      const newInv = {
-        id: `inv_${Date.now()}`,
-        invoiceNumber: generateVoucherNumber(defaultClient, today),
-        clientCode: defaultClient,
-        issueDate: today,
-        dueDate: today,
-        status: 'unpaid',
-        items: [{ description: 'Neighborhood Eye License', quantity: 744, rate: 1, amount: 744 }],
-        receipts: []
-      };
-      state.invoices.unshift(newInv);
-      state.activeInvoiceId = newInv.id;
-      syncInvoiceToLedger(newInv);
-      renderStudio();
-      showNotification(`Created invoice ${newInv.invoiceNumber}`);
-    }
-
-    function duplicateActiveInvoice() {
-      const active = state.invoices.find(i => i.id === state.activeInvoiceId);
-      if (!active) return;
-      const dup = JSON.parse(JSON.stringify(active));
-      dup.id = `inv_${Date.now()}`;
-      dup.invoiceNumber = generateVoucherNumber(active.clientCode, new Date().toISOString().split('T')[0]);
-      dup.receipts = [];
-      state.invoices.unshift(dup);
-      state.activeInvoiceId = dup.id;
-      syncInvoiceToLedger(dup);
-      renderStudio();
-      showNotification('Invoice duplicated');
     }
 
     function openJsonModal() {
@@ -2304,11 +2705,70 @@
       showNotification('JSON payload copied to clipboard');
     }
 
+    Object.assign(window, {
+      state,
+      switchTab,
+      openLogoModal,
+      closeLogoModal,
+      handleLogoFileInput,
+      resetLogoToOriginal,
+      safeShowPicker,
+      showNotification,
+      onStudioInvoiceChange,
+      duplicateActiveInvoice,
+      createNewInvoice,
+      saveActiveInvoiceDraft,
+      postActiveInvoiceToGL,
+      unpostActiveInvoiceFromGL,
+      renderInvoiceRegisterTable,
+      handleStudioItemChange,
+      removeStudioItem,
+      addStudioItem,
+      deleteInvoice,
+      updateStudioReceipt,
+      removeStudioReceipt,
+      addStudioReceipt,
+      updateInvoiceField,
+      onStudioClientChange,
+      renderLedgerTable,
+      traceToStudio,
+      deleteTransaction,
+      renderCoaTable,
+      openAddAccountModal,
+      closeAddAccountModal,
+      onAccountClassChange,
+      onIfrsStandardChange,
+      handleSaveAccount,
+      deleteAccount,
+      setStatementView,
+      setPeriodMode,
+      exportStatementsToExcel,
+      openVoucherModal,
+      closeVoucherModal,
+      setVoucherClass,
+      onIncomeNatureChange,
+      onVoucherClientChange,
+      onFundingTypeChange,
+      onExpenseNatureChange,
+      onVoucherDateChange,
+      regenerateVoucherNo,
+      openClientModal,
+      closeClientModal,
+      handleSaveClient,
+      handlePostVoucher,
+      openJsonModal,
+      closeJsonModal,
+      downloadJsonFile,
+      copyJsonToClipboard,
+      saveStateToCloud
+    });
+
     window.onload = function() {
       setAppLogo(activeLogoSrc);
       state.invoices.forEach(inv => syncInvoiceToLedger(inv));
       renderDashboard();
       renderStudio();
+      initCloudStorage();
     };
   </script>
 </body>
